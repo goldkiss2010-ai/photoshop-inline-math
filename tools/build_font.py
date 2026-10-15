@@ -149,10 +149,17 @@ def build(dest:Path, manifest:Path|None=None, *, family:str='Inline Math Lab',
            'uniqueFontIdentifier':ps_name + ' Experiment ' + version,
            'fullName':family+' Regular','psName':ps_name,'version':'Version '+version}
     names.update(opentype_notices(fixture))
+    # Menu names can be Unicode; keep CFF strings and the PostScript identity
+    # ASCII. Record the same menu name for English and Japanese Windows UIs.
+    cff_family=family
+    if not family.isascii():
+        cff_family=ps_name.removesuffix('-Regular')
+        names['familyName']={'en':family,'ja':family}
+        names['fullName']={'en':family+' Regular','ja':family+' Regular'}
     fb=FontBuilder(UPM,isTTF=False)
     fb.setupGlyphOrder(glyph_order)
     fb.setupCharacterMap(cmap)
-    fb.setupCFF(ps_name,{'FullName':family+' Regular','FamilyName':family,
+    fb.setupCFF(ps_name,{'FullName':cff_family+' Regular','FamilyName':cff_family,
                         'Weight':'Regular'},charstrings,{})
     for name in glyph_order:
         rect=charstrings[name].calcBounds(None)

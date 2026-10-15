@@ -6,6 +6,7 @@ import tempfile
 import unittest
 from io import BytesIO
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
 from zipfile import ZipFile
 ROOT=Path(__file__).resolve().parents[1]
@@ -52,6 +53,73 @@ class FontManagement(unittest.TestCase):
         self.assertTrue(pf.font_current(self.pid,self.store))
         self.assertEqual((self.store/'active.json').read_bytes(),active)
 
+    def test_unicode_otf_names_keep_ascii_postscript_and_cff_identity(self):
+        from fontTools.ttLib import TTFont
+        meta,reg=pf._load(self.pid,self.store)
+        with TTFont(BytesIO(self.font_data)) as font:
+            for lang in (0x409,0x411):
+                self.assertEqual(font['name'].getName(1,3,1,lang).toUnicode(),meta['font']['family'])
+                self.assertEqual(font['name'].getName(4,3,1,lang).toUnicode(),meta['font']['family']+' Regular')
+            self.assertEqual(font['name'].getDebugName(6),meta['font']['postscript_name'])
+            cff=font['CFF '].cff
+            self.assertEqual(cff.fontNames,[meta['font']['postscript_name']])
+            self.assertTrue(cff.topDictIndex[0].FamilyName.isascii())
+            self.assertTrue(cff.topDictIndex[0].FullName.isascii())
+            self.assertEqual(set(font.getBestCmap()),{0xE000})
+
+    def test_append_after_rename_keeps_original_family_and_restores_by_postscript(self):
+        from readonly_mapping import restore_pua_text
+        original=pf.info(self.pid,self.store)['font']
+        pf.rename(self.pid,'別の表示名',self.store)
+        def build(reg,stage):
+            target=stage/'fixture.otf'
+            target.write_bytes(synthetic_font(reg,stage/'drawing'))
+            return target
+        with patch.object(pf,'build_all',side_effect=build):
+            result=pf.prepare(self.pid,'本文 $x^2$ と $y$',self.store)
+        self.assertEqual(result['font'],original)
+        self.assertEqual(result['revision'],2)
+        self.assertTrue(pf.font_current(self.pid,self.store))
+        _,reg=pf._load(self.pid,self.store)
+        text='本文 \ue000 と \ue001'
+        restored=restore_pua_text(text,reg,[{'from':0,'to':len(text),
+            'textStyle':{'fontPostScriptName':original['postscript_name']}}])
+        self.assertEqual(restored['text'],'本文 $x^2$ と $y$')
+
+    def test_windows_registration_matches_unicode_family_and_actual_font_bytes(self):
+        meta,_=pf._load(self.pid,self.store)
+        font=pf.font_file(self.pid,self.store)
+        class Key:
+            def __enter__(self):return self
+            def __exit__(self,*args):pass
+        def enum(key,index):
+            if index:raise OSError('end')
+            return label,str(font),1
+        winreg=SimpleNamespace(HKEY_CURRENT_USER=1,HKEY_LOCAL_MACHINE=2,KEY_READ=1,
+            REG_SZ=1,REG_EXPAND_SZ=2,EnumValue=enum,
+            OpenKey=lambda hive,*args:Key() if hive==1 else self.missing_registry())
+        for label in (meta['font']['family']+' Regular (OpenType)',
+                      meta['font']['postscript_name'].removesuffix('-Regular')+' Regular (OpenType)'):
+            with self.subTest(label=label),patch.dict(sys.modules,winreg=winreg), \
+                 patch.object(pf,'os',SimpleNamespace(name='nt',path=__import__('os').path)):
+                self.assertEqual(pf.windows_status(self.pid,self.store),
+                    {'state':'current','registered_path':str(font)})
+
+    def test_generated_wrong_family_never_replaces_existing_font_or_mapping(self):
+        before=self.snapshot()
+        def wrong_family(reg,stage):
+            wrong=json.loads(json.dumps(reg));wrong['font']['family']='Wrong Family'
+            target=stage/'wrong.otf'
+            target.write_bytes(synthetic_font(wrong,stage/'drawing'))
+            return target
+        with patch.object(pf,'build_all',side_effect=wrong_family):
+            with self.assertRaisesRegex(ValueError,'生成OTFと登録簿'):
+                pf.prepare(self.pid,'本文 $y$',self.store)
+        self.assertEqual(self.snapshot(),before)
+
+    @staticmethod
+    def missing_registry():raise FileNotFoundError('no system font')
+
     def test_duplicate_reserved_and_bad_name_never_modify_files(self):
         pf.create('Other',self.store)
         before=self.snapshot()
@@ -85,6 +153,11 @@ class FontManagement(unittest.TestCase):
             stamp=json.loads(archive.read('stamp.json'))
             self.assertEqual(stamp['source_key'],pf._identity(exported))
             self.assertEqual(manifest['display_name'],'数式 A')
+            exported_meta=json.loads(archive.read('project.json'))
+            self.assertEqual(exported_meta['schema'],2)
+            self.assertEqual(exported_meta['creation_name'],'数式 A')
+            self.assertEqual(exported_meta['font'],meta['font'])
+            self.assertIn(meta['font']['family'],archive.read('README.txt').decode('utf-8'))
             self.assertEqual(manifest['revision'],1)
             self.assertEqual(manifest['font_license_notices'],'source-review-required')
             self.assertEqual(json.loads(archive.read('font-sources.json'))['missing_codepoints'],['E000'])

@@ -68,7 +68,11 @@ class FontManagementAPI(unittest.TestCase):
         self.assertIn('X-Paper-Math-Project',headers['Access-Control-Expose-Headers'])
         with ZipFile(BytesIO(body)) as archive:
             self.assertIsNone(archive.testzip())
-            self.assertEqual(json.loads(archive.read('project.json'))['name'],'数式 新名')
+            exported=json.loads(archive.read('project.json'))
+            self.assertEqual(exported['name'],'数式 新名')
+            self.assertEqual(exported['creation_name'],'First')
+            self.assertEqual(exported['schema'],2)
+            self.assertEqual(exported['font']['family'],health['font']['family'])
             self.assertEqual(json.loads(archive.read('registry.json'))['entries'][0]['latex'],'x')
         self.assertEqual(otf.read_bytes(),before)
 

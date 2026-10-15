@@ -50,15 +50,25 @@ def make_font_bundle(registry, font_data, *, project_id, display_name, project=N
             project.get('managed_by')!='paper-math' or project.get('font')!=registry['font'] or
             project.get('name')!=display_name or font!=registry['font']):
             raise ValueError('書き出し対象の管理情報が一致しません。')
-        meta={'schema':1,'managed_by':'paper-math','project_id':project_id,
+        if project.get('schema') not in (1,2):
+            raise ValueError('書き出し対象の管理情報が一致しません。')
+        meta={'schema':project['schema'],'managed_by':'paper-math','project_id':project_id,
               'name':display_name,'font':font}
+        if meta['schema']==2:
+            from project_fonts import _family, _name
+            creation_name=project.get('creation_name')
+            if (_name(creation_name)!=creation_name or _family(project_id,creation_name)!=font['family'] or
+                ps!='PaperMath'+project_id[3:]+'-Regular'):
+                raise ValueError('書き出し対象の作成時フォント名が一致しません。')
+            meta['creation_name']=creation_name
         files['project.json']=_json(meta)
         identity={'font':font,'pairs':[(e['codepoint'],e['latex']) for e in reg['entries']]}
         source_key=hashlib.sha256(json.dumps(identity,sort_keys=True,ensure_ascii=False).encode('utf-8')).hexdigest()
         files['stamp.json']=_json({'source_key':source_key,'sha256':hashlib.sha256(font_data).hexdigest()})
     files['README.txt']=(
         'Paper Math — フォントと対応表\n\n'
-        '表示名: '+display_name+'\n内部名: '+ps+'\n登録式: '+str(len(reg['entries']))+'\n\n'
+        '表示名: '+display_name+'\nWindows / Photoshopのフォント名: '+font['family']+
+        '\n内部名: '+ps+'\n登録式: '+str(len(reg['entries']))+'\n\n'
         'OTFとregistry.jsonは同じ版の一組です。別フォントの対応表と混ぜないでください。\n'
         '別のWindows環境で表示する場合は、OTFを手動でインストールします。\n'
         'LaTeXへの復元には対応する登録簿も必要です。ZIPの自動読み込み機能は未実装です。\n'

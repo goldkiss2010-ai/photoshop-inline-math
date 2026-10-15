@@ -41,18 +41,37 @@ def _name(value):
     return name
 
 
+def _family(pid, creation_name):
+    """Freeze a readable menu name, within 31 UTF-16 units including the ID."""
+    prefix, suffix = 'Paper Math ', ' '+pid[3:11]
+    budget = 31-len(prefix)-len(suffix)
+    label = ''
+    for char in creation_name:
+        units = 1 if ord(char)<=0xFFFF else 2
+        if units>budget: break
+        label += char
+        budget -= units
+    return prefix+label.rstrip()+suffix
+
+
 def _load(pid, store=STORE):
     folder = _path(pid,store)
     meta = json.loads((folder/'project.json').read_text(encoding='utf-8'))
     reg = json.loads((folder/'registry.json').read_text(encoding='utf-8'))
-    if (meta.get('schema')!=1 or meta.get('project_id')!=pid or
+    if (meta.get('schema') not in (1,2) or meta.get('project_id')!=pid or
         meta.get('managed_by')!='paper-math' or
         meta.get('font')!=reg.get('font') or
         meta['font'].get('engine')!='pdflatex'):
         raise ValueError('Paper Mathフォントの管理情報が一致しません。')
-    # Internal OpenType/CFF names are ASCII and derived from our private ID.
-    # The user's (possibly Japanese) label remains in project.json only.
-    expected_family='Paper Math '+pid[3:]
+    # Schema 1 keeps its original names. Schema 2 freezes a readable Family
+    # at creation; changing the management label must never rename the OTF.
+    if meta['schema']==1:
+        expected_family='Paper Math '+pid[3:]
+    else:
+        creation_name=meta.get('creation_name')
+        if _name(creation_name)!=creation_name:
+            raise ValueError('作成時のフォント名が一致しません。')
+        expected_family=_family(pid,creation_name)
     expected_ps='PaperMath'+pid[3:]+'-Regular'
     if reg['font'].get('family')!=expected_family or reg['font'].get('postscript_name')!=expected_ps:
         raise ValueError('管理外のフォント内部名は使用できません。')
@@ -85,13 +104,21 @@ def create(name, store=STORE):
     base=Path(store)
     base.mkdir(parents=True,exist_ok=True)
     if base.is_symlink(): raise ValueError('管理フォルダがシンボリックリンクです。')
-    for p in projects(store):
+    existing=projects(store)
+    for p in existing:
         if p['name'].casefold()==name.casefold():
             raise ValueError('同名のPaper Mathフォントがあります。')
-    pid='pm-'+uuid.uuid4().hex[:16]
-    font={'family':'Paper Math '+pid[3:],
+    used_families={p['font']['family'].casefold() for p in existing}
+    for _ in range(32):
+        pid='pm-'+uuid.uuid4().hex[:16]
+        family=_family(pid,name)
+        if not (base/pid).exists() and family.casefold() not in used_families: break
+    else:
+        raise ValueError('一意なフォント名を作成できませんでした。もう一度作成してください。')
+    font={'family':family,
           'postscript_name':'PaperMath'+pid[3:]+'-Regular','engine':'pdflatex'}
-    meta={'schema':1,'managed_by':'paper-math','project_id':pid,'name':name,'font':font}
+    meta={'schema':2,'managed_by':'paper-math','project_id':pid,
+          'name':name,'creation_name':name,'font':font}
     reg={'schema':1,'font':font,'next_codepoint':'E000','entries':[]}
     folder=Path(tempfile.mkdtemp(prefix='.creating-',dir=base))
     try:
@@ -189,7 +216,8 @@ def prepare(pid,source,store=STORE, *, scan_report=None, staged_formulas=None):
             with TTFont(BytesIO(font_bytes)) as font:
                 codes={x for x in (font.getBestCmap() or {}) if 0xE000<=x<=0xF8FF}
                 expected={int(e['codepoint'],16) for e in reg['entries']}
-                if codes!=expected or font['name'].getDebugName(6)!=meta['font']['postscript_name']:
+                if (codes!=expected or font['name'].getDebugName(6)!=meta['font']['postscript_name'] or
+                    font['name'].getDebugName(1)!=meta['font']['family']):
                     raise ValueError('生成OTFと登録簿が一致しません。')
             target=font_file(pid,store)
             staging=folder/(target.name+'.new')
@@ -221,6 +249,9 @@ def windows_status(pid,store=STORE):
     meta,_=_load(pid,store)
     family=meta['font']['family']
     ps=meta['font']['postscript_name']
+    # Windows can label a CFF registration with its ASCII name rather than
+    # the Unicode menu name. Exact PostScript identity is checked below.
+    labels=(family.casefold(),ps.removesuffix('-Regular').casefold())
     hits=[]
     regkey=r'SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts'
     for hive in (winreg.HKEY_CURRENT_USER,winreg.HKEY_LOCAL_MACHINE):
@@ -231,7 +262,7 @@ def windows_status(pid,store=STORE):
                     try: label,data,kind=winreg.EnumValue(key,i)
                     except OSError: break
                     i+=1
-                    if not isinstance(data,str) or family.casefold() not in label.casefold(): continue
+                    if not isinstance(data,str) or not any(x in label.casefold() for x in labels): continue
                     if kind not in (winreg.REG_SZ,winreg.REG_EXPAND_SZ): continue
                     p=Path(os.path.expandvars(data))
                     if not p.is_absolute():
