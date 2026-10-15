@@ -2,6 +2,8 @@
 import hashlib
 import json
 import os
+import posixpath
+import re
 from pathlib import Path
 import subprocess
 import sys
@@ -35,6 +37,17 @@ class PublicDistributionTests(unittest.TestCase):
                     self.assertEqual(hashlib.sha256(archive.read('PaperMath/'+name)).hexdigest(),digest)
                 guide=archive.read('PaperMath/FIRST_START.html').decode('utf-8')
                 self.assertIn('Install_Photoshop_Plugin_Alternative.cmd',guide)
+                for target in re.findall(r'(?:href|src)="([^"]+)"',guide):
+                    if not re.match(r'^[a-zA-Z]+:',target):
+                        self.assertIn('PaperMath/'+target,archive.namelist())
+                # End-user documentation must remain navigable after extraction.
+                for name in archive.namelist():
+                    if not name.endswith('.md'):continue
+                    for target in re.findall(r'\]\(([^)]+)\)',archive.read(name).decode('utf-8')):
+                        target=target.split('#')[0]
+                        if not target or re.match(r'^[a-zA-Z]+:',target):continue
+                        resolved=posixpath.normpath(posixpath.join(posixpath.dirname(name),target))
+                        self.assertIn(resolved,archive.namelist(),name+' -> '+target)
 
 @unittest.skipUnless(os.name=='nt','Windows PowerShell required')
 class WindowsInstallerTests(unittest.TestCase):

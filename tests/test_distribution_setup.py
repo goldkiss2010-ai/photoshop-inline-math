@@ -61,14 +61,15 @@ assert registry.ROOT!=app_paths.DATA_ROOT
     def test_preview_package_excludes_work_and_has_source_notices_and_hashes(self):
         with tempfile.TemporaryDirectory() as td:
             base=Path(td);app=base/'app';app.mkdir()
-            for p in dist.TOP_FILES+('photoshop/convert_inline_math.template.psjs',):
+            for p in dist.TOP_FILES+dist.EXAMPLE_FILES+('photoshop/convert_inline_math.template.psjs',):
                 target=app/p;target.parent.mkdir(parents=True,exist_ok=True);target.write_text('source')
             for p in ['tools/app_paths.py','tools/windows_launcher.ps1','tools/install_photoshop_plugin.ps1','photoshop/uxp-panel/manifest.json',
                       'licenses/fonttools-MIT.txt','licenses/OFL-1.1.txt','licenses/GUST-FONT-LICENSE.txt','licenses/LPPL-1.3c.txt']:
                 target=app/p;target.parent.mkdir(parents=True,exist_ok=True);target.write_text('source')
             # Canary data in every currently used generated/production area.
             for p in ['assets/registry.json','local-build/paper-math-projects/private/registry.json',
-                      'assets/private.otf','photoshop/convert_inline_math.psjs','tools/__pycache__/private.py']:
+                      'assets/private.otf','photoshop/convert_inline_math.psjs','tools/__pycache__/private.py',
+                      'examples/math-input/private.qmd','release/private.json']:
                 target=app/p;target.parent.mkdir(parents=True,exist_ok=True);target.write_text('PRIVATE-MANUSCRIPT')
             output=base/'package.zip';dist.build_distribution(output,app)
             with ZipFile(output) as archive:
@@ -81,6 +82,7 @@ assert registry.ROOT!=app_paths.DATA_ROOT
                 self.assertEqual(json.loads(archive.read('PaperMath/assets/registry.json')),dist.seed_registry())
                 self.assertEqual(dist.seed_registry()['entries'][0]['latex'],r'\dfrac{a+b}{c}')
                 self.assertIn('PaperMath/tools/windows_launcher.ps1',archive.namelist())
+                for name in dist.EXAMPLE_FILES:self.assertIn('PaperMath/'+name,archive.namelist())
 
     @unittest.skipUnless(os.name=='nt','Windows PowerShell required')
     def test_windows_launcher_parses_and_reads_paths_without_installing(self):

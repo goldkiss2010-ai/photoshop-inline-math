@@ -2,13 +2,17 @@
 
 LaTeXの数式を、Photoshopの本文へ文字として組み込むプラグインです。数式を1つのフォントグリフに変換し、同じテキストレイヤー上でLaTeXへ戻して編集できます。
 
+制作物ごとに数式フォントを作り、使う式を少しずつ追加します。一度割り当てた文字コードと数式の対応を保持し、フォントと対応表を制作物のアセットとして管理します。
+
 Paper Math turns LaTeX expressions into individual OpenType glyphs for native Photoshop text, with a persistent LaTeX/PUA mapping for reverse conversion.
 
 **Windowsプレビュー / 0.8.2。** Windows 10・Photoshop 27.4.0で、CCX導入、UDTを使わない起動、配布ZIPを別フォルダーへ展開したセットアップ・起動・変換／復元について成功報告があります。別PCでの初回導入確認はこれからです。
 
 ## はじめる
 
-1. このリポジトリをZIPで取得してすべて展開するか、配布用ZIPを展開します。
+通常利用の配布ファイルは **`PaperMath-Windows-preview.zip`** です。[配布ページ](https://github.com/goldkiss2010-ai/photoshop-inline-math/releases)に公開されたファイル、または作者から受け取った配布ZIPを使います。GitHubが自動生成する「Source code」のZIPとは、制作データの保存先が異なります。
+
+1. ZIPをすべて展開し、`PaperMath` フォルダー内の `FIRST_START.html` を開きます。
 2. [MiKTeX](https://miktex.org/download)などのTeX環境を準備します。必要なパッケージは[導入ガイド](docs/INSTALL_WINDOWS.md)を参照してください。
 3. `Setup_Paper_Math.cmd` をダブルクリックします。専用のPython環境と必要なパッケージを準備します。
 4. `Install_Photoshop_Plugin.cmd` を開き、Creative Cloudでインストールします。確認画面が出ない場合は `Install_Photoshop_Plugin_Alternative.cmd` を試します。
@@ -29,7 +33,7 @@ Paper Math turns LaTeX expressions into individual OpenType glyphs for native Ph
 
 フォントの表示名変更、登録式数の確認、OTF・対応表・出所通知をまとめたZIP保存に対応します。**フォントと対応表は一組で保管**してください。別端末でPSDを表示するには、その制作物のOTFの導入が必要です。
 
-エクスプローラーで選ぶインストール用OTFとZIP内のOTFは、`PaperMath-配布確認-4f3b3403.otf` のように管理画面の表示名を含むファイル名にします。中身は生成済みフォントと同じです。Photoshopのフォント一覧に出る名前と内部の識別名は、従来のASCII名を維持します。
+エクスプローラーで選ぶインストール用OTFとZIP内のOTFは、`PaperMath-配布確認-a1b2c3d4.otf` のように管理画面の表示名を含むファイル名にします。中身は生成済みフォントと同じです。Photoshopのフォント一覧に出る名前と内部の識別名は、従来のASCII名を維持します。
 
 配布用ZIPでは制作データを `%LOCALAPPDATA%\PaperMath\data` へ保存します。GitやGitHubのソースZIPから起動する場合は、その作業フォルダー内へ保存します。[保存先と更新](docs/WINDOWS_PREVIEW.md)を参照してください。
 
@@ -39,9 +43,10 @@ Paper Math turns LaTeX expressions into individual OpenType glyphs for native Ph
 - 数式入力は `$...$`、`$$...$$`、`\(...\)`、`\[...\]` と対応する数式環境。復元は `$...$` に統一します。
 - 約36,000文字のコード混在原稿の往復とPSD再オープンについて実機成功報告があります。すべての長文・書式・環境の保証ではありません。
 - 数式内の改行・元の区切り記号・変換前の数式書式の完全復元、ZIPの自動読み込み、他アプリとの相互編集は現在の対象外です。
+- 絵文字や一部の拡張漢字など、BMP外の文字を含むテキストレイヤーは未対応です。
 - ブラウザ版・Illustrator版・過去の実験はこのリポジトリに含めません。ブラウザ版の機能整理とPagesは後続の作業です。
 
-詳細は[現行仕様](docs/CURRENT_SPEC.md)、[フォント管理](docs/PROJECT_FONT_MANAGEMENT.md)、[検証状況](docs/TESTING.md)を参照してください。
+入力例は[混在サンプル](examples/math-input/README.md)、対応範囲は[既知の制約](docs/KNOWN_LIMITATIONS.md)、困ったときは[トラブル対処](docs/TROUBLESHOOTING.md)を参照してください。技術的な詳細は[現行仕様](docs/CURRENT_SPEC.md)、[フォント管理](docs/PROJECT_FONT_MANAGEMENT.md)、[検証状況](docs/TESTING.md)にまとめています。
 
 ## 開発と配布
 

@@ -32,7 +32,9 @@ uv run --no-project python tools/build_distribution.py
 
 既定で収録済みCCXを照合して `local-build/PaperMath-Windows-preview.zip` へ同梱します。別の実CCXは `--ccx`、作者用のソースのみのZIPは `--without-ccx` で指定します。
 
-本体、編集可能なPython/UXP/PowerShellのソース、テスト、案内、通知、固定6式のサンプル登録簿を含めます。制作登録簿や生成フォント・PSD・キャッシュ・導入済みPython/TeXは収録しません。`distribution-files.json` は同梱ファイルのSHA-256を保持します。
+本体、編集可能なPython/UXP/PowerShellのソース、テスト、案内、通知、固定6式のサンプル登録簿と混在入力サンプルを含めます。入力サンプルは `EXAMPLE_FILES` に列挙した6ファイルだけを収録します。制作登録簿や生成フォント・PSD・キャッシュ・導入済みPython/TeXは収録しません。`distribution-files.json` は同梱ファイルのSHA-256を保持します。
+
+初回プレビューの公開用ファイルは、リポジトリの `release/windows-preview-1` へ保存します。案内やハッシュを公開用フォルダーへ追記した後も、確定済みの配布ZIPは再生成せず、そのバイト列を公開します。公開操作はリポジトリ直下の `PUBLISH_WINDOWS_PREVIEW.md` を参照してください。
 
 ## インストール時の代替経路
 

@@ -22,6 +22,9 @@ TOP_FILES=('Setup_Paper_Math.cmd','Start_Paper_Math.cmd','Check_Paper_Math.cmd',
 # generated scripts, assets and binary fonts have no route into the archive.
 SOURCE_SUFFIXES={'tools':{'.py','.ps1'},'photoshop/uxp-panel':{'.js','.html','.css','.json','.png','.svg'},
                  'licenses':{'.txt'},'docs':{'.md'},'tests':{'.py','.cjs','.json','.qmd','.txt'}}
+EXAMPLE_FILES=('examples/math-input/README.md','examples/math-input/01_valid_mixed.qmd',
+               'examples/math-input/02_partial_conflicts.qmd','examples/math-input/03_unclosed_code.qmd',
+               'examples/math-input/04_inline_code.qmd','examples/math-input/05_render_failure.qmd')
 # Preserve the already-issued six legacy meanings; never package a user's registry.
 SEED_FORMULAS=(r'\dfrac{a+b}{c}',r'\int_0^1 x^2\,\mathrm{d}x',
                r'\displaystyle\sum_{i=0}^{n}x_i',r'\sqrt{x^2+1}',r'x_i^2',r'\alpha+\beta')
@@ -33,7 +36,7 @@ def seed_registry():
 
 def build_distribution(output,root=ROOT,ccx=None):
     root=Path(root).resolve();output=Path(output).resolve()
-    paths=list(TOP_FILES)+['photoshop/convert_inline_math.template.psjs']
+    paths=list(TOP_FILES)+list(EXAMPLE_FILES)+['photoshop/convert_inline_math.template.psjs']
     for directory,suffixes in SOURCE_SUFFIXES.items():
         paths.extend(p.relative_to(root).as_posix() for p in (root/directory).rglob('*')
                      if p.is_file() and p.suffix in suffixes and '__pycache__' not in p.parts

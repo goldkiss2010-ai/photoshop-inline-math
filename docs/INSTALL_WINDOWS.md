@@ -1,6 +1,6 @@
 # Windowsでの導入
 
-対象はWindowsのPhotoshopです。動作報告はWindows 10 / Photoshop 27.4.0。最初にZIPをすべて展開し、作業中に使うフォルダーへ保存します。ソースZIPからも導入できます。
+対象はWindowsのPhotoshopです。動作報告はWindows 10 / Photoshop 27.4.0。配布用の `PaperMath-Windows-preview.zip` をすべて展開し、`PaperMath` フォルダーを保存します。中の `FIRST_START.html` が最初の案内です。ソースZIPからも導入できますが、制作データの保存先が異なります。
 
 ## 初回だけ行うこと
 
@@ -10,6 +10,16 @@
 4. `Start_Paper_Math.cmd` を起動し、Photoshopの「プラグイン」→「Paper Math」を開きます。
 
 利用者がGitやUXP Developer Toolを用意する必要はありません。アプリ本体とTeXは別の導入です。フォント生成・更新時にはパネルの案内に沿ってOTFをWindowsへインストールします。
+
+## 最初の数式を変換する
+
+1. Photoshopで新しいPSDを作り、テキストレイヤーへ `本文 $x_i^2$ と $\frac{a+b}{c}$。` と入力します。
+2. Paper Mathの「フォントを作成・管理」を開き、制作物用の名前でフォントを新規作成します。
+3. テキストレイヤーを1つ選択して変換します。フォント生成後、案内された「フォントの更新先を開く」を押します。
+4. 選択された日本語ファイル名のOTFをWindowsへインストールし、パネルでフォントを照合して適用します。Photoshopが新規フォントを認識しないときは、保存後にPhotoshopを再起動し、同じフォントを選んで変換し直します。
+5. LaTeXへ復元し、本文と数式が戻ることを確認します。
+
+フォントのインストールは最初の生成と、式を追加してOTFが更新されたときに行います。すでに登録済みの式だけを使い、生成版も同じなら、毎回インストールする必要はありません。原稿の例は[混在サンプル](../examples/math-input/README.md)に収録しています。
 
 ## インストール確認画面が出ない場合
 
@@ -40,3 +50,5 @@ uv run --no-project --python 3.13.15 --with-requirements requirements-runtime.tx
 出所記録の `complete` は、使用した字形の記録が揃ったことを示します。すべてのフォントの配布条件を一括で認定する値ではありません。
 
 保存先・バックアップ・更新は [WINDOWS_PREVIEW.md](WINDOWS_PREVIEW.md)、作者のCCX作成は [PACKAGE_PHOTOSHOP.md](PACKAGE_PHOTOSHOP.md)を参照してください。
+
+[既知の制約](KNOWN_LIMITATIONS.md)と[トラブル対処](TROUBLESHOOTING.md)も参照できます。

@@ -3,12 +3,15 @@
 <style>body{font:17px/1.85 system-ui,sans-serif;color:#292929;background:#faf9f6;max-width:760px;margin:5vh auto;padding:24px}h1{font-size:30px}h2{font-size:21px;margin-top:2em}code{background:#eeeae3;padding:3px 6px}a{color:#31556c}</style></head><body>
 <h1>Paper Math</h1><p>LaTeXの数式を、Photoshopの本文に組み込みます。変換した数式はLaTeXへ戻せます。</p>
 <p id="plugin-installer">Windowsプレビュー版です。初回セットアップの後、<code>Install_Photoshop_Plugin.cmd</code> を開き、Creative Cloudでプラグインをインストールします。利用時にUXP Developer Toolは不要です。</p>
-<h2>初回の準備</h2><ol><li>ZIPをすべて展開し、アプリのフォルダーを保存します。</li><li><a href="https://miktex.org/download">MiKTeX</a>などのTeX環境を準備します。必要なパッケージは<a href="docs/INSTALL_WINDOWS.md">導入ガイド</a>に記載しています。</li><li><code>Setup_Paper_Math.cmd</code> をダブルクリックします。初回はネット接続が必要です。Pythonと必要なパッケージを専用の場所に準備します。</li><li><code>Install_Photoshop_Plugin.cmd</code> を開き、Creative Cloudの確認画面でインストールします。</li></ol>
+<h2>初回の準備</h2><ol><li>ZIPをすべて展開し、アプリのフォルダーを保存します。</li><li><a href="https://miktex.org/download">MiKTeX</a>などのTeX環境を準備します。<code>pdflatex</code>・<code>lualatex</code>・<code>kpsewhich</code> と、<code>standalone</code>・<code>amsmath</code>・<code>amssymb</code> が必要です。</li><li><code>Setup_Paper_Math.cmd</code> をダブルクリックします。初回はネット接続が必要です。Pythonと必要なパッケージを専用の場所に準備します。</li><li><code>Install_Photoshop_Plugin.cmd</code> を開き、Creative Cloudの確認画面でインストールします。</li></ol>
 <p>インストールの確認画面が出ない場合は、<code>Install_Photoshop_Plugin_Alternative.cmd</code> を試してください。</p>
 <h2>普段の使い方</h2><ol><li><code>Start_Paper_Math.cmd</code> をダブルクリックします。</li><li>Photoshopの「プラグイン」→「Paper Math」を開きます。</li><li>制作フォントとテキストレイヤーを選び、数式を変換・復元します。</li></ol>
 <p>起動したウィンドウは作業中は開いたままにします。閉じるとPaper Mathの処理も終了します。フォントの新規生成・更新時は、パネルの案内に沿ってOTFをインストールしてください。</p>
+<h2>最初の確認</h2><p>テキストレイヤーへ <code>本文 $x_i^2$ です。</code> と入力し、Paper Mathで制作フォントを新規作成して変換します。フォント生成後、「フォントの更新先を開く」で選択されたOTFをWindowsへインストールし、パネルで照合して適用します。</p>
+<p>LaTeXへ復元すると区切りは <code>$...$</code> に揃います。入力例は <code>examples/math-input</code> に同梱しています。詳しい手順は<a href="docs/INSTALL_WINDOWS.md">導入ガイド</a>を参照してください。</p>
 <h2>データと更新</h2><p>配布用ZIPでは制作データを <code>%LOCALAPPDATA%\PaperMath\data</code> に保存します。GitHubのソースZIPから起動する場合は、その作業フォルダー内に保存します。<code>Open_Paper_Math_Data.cmd</code> で保存先を開けます。</p>
 <p>フォントと対応表は一緒に保管してください。旧開発版からの継続と更新は<a href="docs/WINDOWS_PREVIEW.md">保存先と更新</a>を参照してください。</p>
 <h2>うまく動かないとき</h2><p><code>Check_Paper_Math.cmd</code> をダブルクリックします。点検の描画は一時フォルダーで行い、PSDやWindows登録フォントは変更しません。</p>
+<p><a href="docs/TROUBLESHOOTING.md">トラブル対処</a>と<a href="docs/KNOWN_LIMITATIONS.md">既知の制約</a>も同梱しています。対象はWindowsのPhotoshopです。絵文字などBMP外の文字は未対応です。</p>
 <p>依存の通知は <a href="THIRD_PARTY_NOTICES.md">THIRD_PARTY_NOTICES.md</a>、アプリの利用・改変条件は <a href="LICENSE_SCOPE.md">LICENSE_SCOPE.md</a> に記載しています。</p>
 </body></html>
