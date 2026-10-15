@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "product": "Paper Math for Photoshop",
+  "title": "Paper Math for Photoshop 0.8.2 / Windows Preview 1",
+  "tag": "v0.8.2-preview.1",
+  "prerelease": true,
+  "target_branch": "release/windows-preview-1",
+  "source_commit": "30569e6d8381407ef678348dddbad06b8c9ab5e0",
+  "release_assets": ["PaperMath-Windows-preview.zip", "SHA256SUMS.txt"],
+  "archive": {
+    "name": "PaperMath-Windows-preview.zip",
+    "sha256": "11e6c1429a851f894bdbb15c00529c21c34179f0814948b423715d740e58cb6d",
+    "size_bytes": 383246,
+    "files": 155
+  },
+  "plugin": {
+    "id": "com.goldkiss2010.papermath",
+    "version": "0.8.2",
+    "sha256": "705672f2b5dcdebb3975cf6a11034764da5095e2a0023146efb2a202b0e318d6"
+  },
+  "windows_test_reference": {
+    "source_commit": "6a5941e30f38e04313f607415cace6799765f57f",
+    "archive_sha256": "345aa6e19c0fd2bcbfcad7edcb72353f27b8128e7ac0f54d99a45138c984d772",
+    "identical_runtime_and_notice_files": 79,
+    "release_archive_has_documentation_and_sample_changes": true,
+    "release_archive_reinstalled_on_windows": false
+  }
+}

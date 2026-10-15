@@ -1,0 +1,34 @@
+{
+  "archive": "PaperMath-Windows-preview.zip",
+  "sha256": "11e6c1429a851f894bdbb15c00529c21c34179f0814948b423715d740e58cb6d",
+  "size_bytes": 383246,
+  "files": 155,
+  "runtime_identical_files": 79,
+  "added_files": [
+    "PaperMath/docs/KNOWN_LIMITATIONS.md",
+    "PaperMath/docs/TROUBLESHOOTING.md",
+    "PaperMath/examples/math-input/01_valid_mixed.qmd",
+    "PaperMath/examples/math-input/02_partial_conflicts.qmd",
+    "PaperMath/examples/math-input/03_unclosed_code.qmd",
+    "PaperMath/examples/math-input/04_inline_code.qmd",
+    "PaperMath/examples/math-input/05_render_failure.qmd",
+    "PaperMath/examples/math-input/README.md"
+  ],
+  "changed_existing_files": [
+    "FIRST_START.html",
+    "README.md",
+    "distribution-files.json",
+    "docs/INSTALL_WINDOWS.md",
+    "docs/PACKAGE_PHOTOSHOP.md",
+    "docs/RELEASE_CHECKLIST.md",
+    "docs/TESTING.md",
+    "tests/test_distribution_setup.py",
+    "tests/test_plugin_installer.py",
+    "tools/build_distribution.py"
+  ],
+  "baseline_sha256": "345aa6e19c0fd2bcbfcad7edcb72353f27b8128e7ac0f54d99a45138c984d772",
+  "crc_and_manifest_hashes": true,
+  "ccx_sha256": "705672f2b5dcdebb3975cf6a11034764da5095e2a0023146efb2a202b0e318d6",
+  "source_commit": "30569e6d8381407ef678348dddbad06b8c9ab5e0",
+  "source_branch": "release/windows-preview-1"
+}
