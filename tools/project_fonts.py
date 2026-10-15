@@ -108,17 +108,10 @@ def create(name, store=STORE):
     for p in existing:
         if p['name'].casefold()==name.casefold():
             raise ValueError('同名のPaper Mathフォントがあります。')
-    used_families={p['font']['family'].casefold() for p in existing}
-    for _ in range(32):
-        pid='pm-'+uuid.uuid4().hex[:16]
-        family=_family(pid,name)
-        if not (base/pid).exists() and family.casefold() not in used_families: break
-    else:
-        raise ValueError('一意なフォント名を作成できませんでした。もう一度作成してください。')
-    font={'family':family,
+    pid='pm-'+uuid.uuid4().hex[:16]
+    font={'family':'Paper Math '+pid[3:],
           'postscript_name':'PaperMath'+pid[3:]+'-Regular','engine':'pdflatex'}
-    meta={'schema':2,'managed_by':'paper-math','project_id':pid,
-          'name':name,'creation_name':name,'font':font}
+    meta={'schema':1,'managed_by':'paper-math','project_id':pid,'name':name,'font':font}
     reg={'schema':1,'font':font,'next_codepoint':'E000','entries':[]}
     folder=Path(tempfile.mkdtemp(prefix='.creating-',dir=base))
     try:
@@ -128,6 +121,39 @@ def create(name, store=STORE):
     finally:
         if folder.exists(): shutil.rmtree(folder)
     return info(pid,store)
+
+
+def install_filename(pid,name):
+    """A user-facing filename only; never an OpenType/CFF identity."""
+    if not isinstance(pid,str) or not ID_RE.fullmatch(pid):
+        raise ValueError('不正なPaper MathフォントIDです。')
+    return 'PaperMath-'+_name(name)+'-'+pid[3:11]+'.otf'
+
+
+def installation_copy(pid,store=STORE):
+    """Prepare a readable local copy for manual install, with identical bytes."""
+    meta,_=_load(pid,store)
+    if not font_current(pid,store):
+        raise ValueError('生成OTFが現在の対応表と一致しません。先に数式を変換してください。')
+    name=_name(meta['name'])
+    parent=_path(pid,store)/'install'
+    folder=parent/('PaperMath-'+name)
+    for path in (parent,folder):
+        if path.is_symlink():raise ValueError('インストール用フォルダがリンクになっています。')
+        path.mkdir(exist_ok=True)
+    target=folder/install_filename(pid,name)
+    if target.is_symlink():raise ValueError('インストール用OTFがリンクになっています。')
+    data=font_file(pid,store).read_bytes()
+    if not target.is_file() or target.read_bytes()!=data:
+        staging=None
+        try:
+            with tempfile.NamedTemporaryFile('wb',dir=folder,delete=False) as handle:
+                staging=Path(handle.name)
+                handle.write(data)
+            os.replace(staging,target)
+        finally:
+            if staging is not None:staging.unlink(missing_ok=True)
+    return target
 
 
 def rename(pid,name,store=STORE):

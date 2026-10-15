@@ -33,6 +33,7 @@ class FontManagementAPI(unittest.TestCase):
             patch.object(server,'rename_project',side_effect=lambda pid,name:pf.rename(pid,name,self.store)),
             patch.object(server,'project_font_current',side_effect=lambda pid:pf.font_current(pid,self.store)),
             patch.object(server,'project_font_file',side_effect=lambda pid:pf.font_file(pid,self.store)),
+            patch.object(server,'project_installation_copy',side_effect=lambda pid:pf.installation_copy(pid,self.store)),
             patch.object(server,'refresh',side_effect=AssertionError('export must not build'))]
         for p in self.patches:p.start()
         self.http=ThreadingHTTPServer(('127.0.0.1',0),server.make_handler())
@@ -70,11 +71,25 @@ class FontManagementAPI(unittest.TestCase):
             self.assertIsNone(archive.testzip())
             exported=json.loads(archive.read('project.json'))
             self.assertEqual(exported['name'],'数式 新名')
-            self.assertEqual(exported['creation_name'],'First')
-            self.assertEqual(exported['schema'],2)
+            self.assertNotIn('creation_name',exported)
+            self.assertEqual(exported['schema'],1)
             self.assertEqual(exported['font']['family'],health['font']['family'])
+            manifest=json.loads(archive.read('bundle.json'))
+            self.assertIn('数式 新名',manifest['font_file'])
+            self.assertEqual(archive.read(manifest['font_file']),before)
             self.assertEqual(json.loads(archive.read('registry.json'))['entries'][0]['latex'],'x')
         self.assertEqual(otf.read_bytes(),before)
+
+    def test_update_folder_opens_readable_copy_without_modifying_source_font(self):
+        pf.rename(self.pid,'日本語 フォント',self.store)
+        source=pf.font_file(self.pid,self.store);before=source.read_bytes()
+        with patch.object(server,'open_explorer',return_value={'result':'explorer_opened'}) as explorer:
+            status,_,body=self.request('POST','/api/font/update/open',{})
+        self.assertEqual(status,200)
+        target=explorer.call_args.kwargs['direct_source']
+        self.assertIn('日本語 フォント',target.name)
+        self.assertEqual(target.read_bytes(),before)
+        self.assertEqual(source.read_bytes(),before)
 
     def test_foreign_selected_project_and_extra_path_arguments_are_rejected(self):
         other=pf.create('Other',self.store)['project_id']

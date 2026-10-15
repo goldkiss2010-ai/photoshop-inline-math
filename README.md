@@ -29,7 +29,7 @@ Paper Math turns LaTeX expressions into individual OpenType glyphs for native Ph
 
 フォントの表示名変更、登録式数の確認、OTF・対応表・出所通知をまとめたZIP保存に対応します。**フォントと対応表は一組で保管**してください。別端末でPSDを表示するには、その制作物のOTFの導入が必要です。
 
-新しく作るフォントには、作成時の名前と短いIDを付けます（例：`Paper Math 配布確認 4f3b3403`）。作成後に管理画面の表示名を変更しても、このフォント名は固定です。既存フォントは従来名を維持します。日本語名のWindows/Photoshop表示は現在、実機確認待ちです。
+エクスプローラーで選ぶインストール用OTFとZIP内のOTFは、`PaperMath-配布確認-4f3b3403.otf` のように管理画面の表示名を含むファイル名にします。中身は生成済みフォントと同じです。Photoshopのフォント一覧に出る名前と内部の識別名は、従来のASCII名を維持します。
 
 配布用ZIPでは制作データを `%LOCALAPPDATA%\PaperMath\data` へ保存します。GitやGitHubのソースZIPから起動する場合は、その作業フォルダー内へ保存します。[保存先と更新](docs/WINDOWS_PREVIEW.md)を参照してください。
 

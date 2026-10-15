@@ -5,7 +5,6 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
-from types import SimpleNamespace
 from unittest.mock import patch
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -50,39 +49,27 @@ class FontProjectTests(unittest.TestCase):
         self.assertEqual(pf.select(a['project_id'],self.store),a['project_id'])
         self.assertEqual(pf.selected(self.store)[0],a['project_id'])
         self.assertEqual(pf.selected(self.store)[2]['entries'],[])
-        self.assertIn('数式図版 2026',a['font']['family'])
-        self.assertTrue(a['font']['family'].endswith(a['project_id'][3:11]))
+        self.assertEqual(a['font']['family'],'Paper Math '+a['project_id'][3:])
         self.assertTrue(a['font']['postscript_name'].isascii())
         self.assertIn('数式図版',a['name'])
         pf.select('legacy',self.store)
         self.assertEqual(pf.active(self.store),'legacy')
 
-    def test_long_names_keep_complete_short_id_within_windows_family_limit(self):
+    def test_long_labels_affect_install_filename_without_changing_font_identity(self):
         for name in ('Long Project Name For Figure','数式図版用フォント二十八文字まで入力できる名前', '\U00010400'*28):
             with self.subTest(name=name):
                 p=self.create(name)
-                family=p['font']['family']
-                self.assertLessEqual(len(family.encode('utf-16-be'))//2,31)
-                self.assertTrue(family.endswith(p['project_id'][3:11]))
-                self.assertTrue(family.startswith('Paper Math '+name[0]))
+                self.assertEqual(p['font']['family'],'Paper Math '+p['project_id'][3:])
+                self.assertEqual(pf.install_filename(p['project_id'],name),
+                    'PaperMath-'+name+'-'+p['project_id'][3:11]+'.otf')
                 self.assertEqual(pf.info(p['project_id'],self.store)['font'],p['font'])
-
-    def test_same_short_id_and_truncated_label_regenerates_identity(self):
-        first=SimpleNamespace(hex='1234567800000000'+'0'*16)
-        collision=SimpleNamespace(hex='1234567811111111'+'0'*16)
-        distinct=SimpleNamespace(hex='8765432100000000'+'0'*16)
-        with patch.object(pf.uuid,'uuid4',side_effect=[first,collision,distinct]):
-            a=self.create('Long Shared Label A')
-            b=self.create('Long Shared Label B')
-        self.assertNotEqual(a['font']['family'],b['font']['family'])
-        self.assertEqual(b['project_id'],'pm-8765432100000000')
-        self.assertEqual(len(pf.projects(self.store)),2)
 
     def test_schema_one_keeps_old_identity_and_files_on_load_select_and_rename(self):
         p=self.create('旧フォント')
         pid=p['project_id'];folder=self.store/pid
         meta,reg=pf._load(pid,self.store)
-        meta['schema']=1;meta.pop('creation_name')
+        self.assertEqual(meta['schema'],1)
+        self.assertNotIn('creation_name',meta)
         meta['font']['family']='Paper Math '+pid[3:]
         reg['font']=meta['font']
         for filename,value in (('project.json',meta),('registry.json',reg)):
@@ -99,6 +86,13 @@ class FontProjectTests(unittest.TestCase):
         p=self.create('Fixed Name')
         folder=self.store/p['project_id']
         meta,reg=pf._load(p['project_id'],self.store)
+        # Preserve access to schema-2 test assets from the earlier build.
+        meta['schema']=2
+        meta['font']['family']=reg['font']['family']=pf._family(p['project_id'],'Fixed Name')
+        meta['creation_name']='Fixed Name'
+        for filename,value in (('project.json',meta),('registry.json',reg)):
+            (folder/filename).write_text(json.dumps(value),encoding='utf-8')
+        self.assertEqual(pf.info(p['project_id'],self.store)['font'],meta['font'])
         meta['creation_name']='Other Name'
         (folder/'project.json').write_text(json.dumps(meta),encoding='utf-8')
         with self.assertRaises(ValueError):pf.info(p['project_id'],self.store)

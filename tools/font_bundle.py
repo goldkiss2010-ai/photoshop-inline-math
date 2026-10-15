@@ -42,7 +42,11 @@ def make_font_bundle(registry, font_data, *, project_id, display_name, project=N
     for original,entry in zip(registry['entries'],reg['entries']):
         sources=portable_sources(original.get('fontSources'))
         if sources is not None:entry['fontSources']=sources
-    files={ps+'.otf':font_data,'registry.json':_json(reg)}
+    filename=ps+'.otf'
+    if project_id!='legacy':
+        from project_fonts import install_filename
+        filename=install_filename(project_id,display_name)
+    files={filename:font_data,'registry.json':_json(reg)}
     notices,source_info=notice_files(reg['entries'])
     files.update(notices)
     if project_id!='legacy':
@@ -67,7 +71,8 @@ def make_font_bundle(registry, font_data, *, project_id, display_name, project=N
         files['stamp.json']=_json({'source_key':source_key,'sha256':hashlib.sha256(font_data).hexdigest()})
     files['README.txt']=(
         'Paper Math — フォントと対応表\n\n'
-        '表示名: '+display_name+'\nWindows / Photoshopのフォント名: '+font['family']+
+        '表示名: '+display_name+'\nOTFファイル名: '+filename+
+        '\nWindows / Photoshopのフォント名: '+font['family']+
         '\n内部名: '+ps+'\n登録式: '+str(len(reg['entries']))+'\n\n'
         'OTFとregistry.jsonは同じ版の一組です。別フォントの対応表と混ぜないでください。\n'
         '別のWindows環境で表示する場合は、OTFを手動でインストールします。\n'
@@ -77,7 +82,7 @@ def make_font_bundle(registry, font_data, *, project_id, display_name, project=N
         '出所未記録や複数ライセンスが混ざるフォントは、配布条件を別途確認します。\n'
     ).encode('utf-8')
     manifest={'schema':1,'format':'paper-math-font-bundle','project_id':project_id,
-              'display_name':display_name,'font':font,'revision':len(reg['entries']),
+              'display_name':display_name,'font':font,'font_file':filename,'revision':len(reg['entries']),
               'files':{name:hashlib.sha256(data).hexdigest() for name,data in files.items()},
               'font_license_notices':'ofl-source-notices' if ofl_only(source_info) else 'source-review-required',
               'source_coverage':source_info['coverage']}

@@ -24,6 +24,7 @@ from project_fonts import (
     select as select_project, projects as list_projects, rename as rename_project,
     selected as selected_project, prepare as prepare_project,
     font_file as project_font_file, font_current as project_font_current,
+    installation_copy as project_installation_copy,
     windows_status as project_windows_status,
 )
 from font_update_guard import (GuardError, SOURCE, prepare as prepare_font_update,
@@ -306,7 +307,7 @@ def make_handler():
                 with _REGISTRY_LOCK:
                     pid, _, _ = selected_project()
                     if pid != 'legacy':
-                        result = open_explorer(direct_source=project_font_file(pid))
+                        result = open_explorer(direct_source=project_installation_copy(pid))
                         before = {'result': 'project_font_manual_install'}
                     else:
                         registrations = windows_registry_entries()

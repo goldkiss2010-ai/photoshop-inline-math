@@ -53,11 +53,11 @@ class FontManagement(unittest.TestCase):
         self.assertTrue(pf.font_current(self.pid,self.store))
         self.assertEqual((self.store/'active.json').read_bytes(),active)
 
-    def test_unicode_otf_names_keep_ascii_postscript_and_cff_identity(self):
+    def test_new_font_keeps_original_ascii_identity_in_name_and_cff_tables(self):
         from fontTools.ttLib import TTFont
         meta,reg=pf._load(self.pid,self.store)
         with TTFont(BytesIO(self.font_data)) as font:
-            for lang in (0x409,0x411):
+            for lang in (0x409,):
                 self.assertEqual(font['name'].getName(1,3,1,lang).toUnicode(),meta['font']['family'])
                 self.assertEqual(font['name'].getName(4,3,1,lang).toUnicode(),meta['font']['family']+' Regular')
             self.assertEqual(font['name'].getDebugName(6),meta['font']['postscript_name'])
@@ -66,6 +66,33 @@ class FontManagement(unittest.TestCase):
             self.assertTrue(cff.topDictIndex[0].FamilyName.isascii())
             self.assertTrue(cff.topDictIndex[0].FullName.isascii())
             self.assertEqual(set(font.getBestCmap()),{0xE000})
+
+    def test_installation_copy_has_japanese_filename_and_identical_font_bytes(self):
+        before=self.snapshot()
+        target=pf.installation_copy(self.pid,self.store)
+        self.assertEqual(target.name,'PaperMath-数式 A-'+self.pid[3:11]+'.otf')
+        self.assertEqual(target.read_bytes(),self.font_data)
+        self.assertNotEqual(target,pf.font_file(self.pid,self.store))
+        self.assertEqual(self.snapshot(),before)
+        pf.rename(self.pid,'数式 別名',self.store)
+        renamed=pf.installation_copy(self.pid,self.store)
+        self.assertIn('数式 別名',renamed.name)
+        self.assertEqual(renamed.read_bytes(),self.font_data)
+        self.assertEqual(list(renamed.parent.glob('*.otf')),[renamed])
+        renamed.write_bytes(b'old copy')
+        self.assertEqual(pf.installation_copy(self.pid,self.store).read_bytes(),self.font_data)
+
+    def test_stale_or_missing_source_never_prepares_an_installation_copy(self):
+        pf.font_file(self.pid,self.store).write_bytes(b'stale')
+        with self.assertRaises(ValueError):pf.installation_copy(self.pid,self.store)
+        self.assertFalse((self.folder/'install').exists())
+
+    def test_installation_copy_does_not_follow_an_external_directory_link(self):
+        outside=self.base/'outside';outside.mkdir()
+        try:(self.folder/'install').symlink_to(outside,target_is_directory=True)
+        except OSError:self.skipTest('Directory symlink unavailable')
+        with self.assertRaises(ValueError):pf.installation_copy(self.pid,self.store)
+        self.assertEqual(list(outside.iterdir()),[])
 
     def test_append_after_rename_keeps_original_family_and_restores_by_postscript(self):
         from readonly_mapping import restore_pua_text
@@ -86,7 +113,7 @@ class FontManagement(unittest.TestCase):
             'textStyle':{'fontPostScriptName':original['postscript_name']}}])
         self.assertEqual(restored['text'],'本文 $x^2$ と $y$')
 
-    def test_windows_registration_matches_unicode_family_and_actual_font_bytes(self):
+    def test_windows_registration_matches_family_or_cff_label_and_actual_font_bytes(self):
         meta,_=pf._load(self.pid,self.store)
         font=pf.font_file(self.pid,self.store)
         class Key:
@@ -139,7 +166,8 @@ class FontManagement(unittest.TestCase):
         with ZipFile(BytesIO(bundle['data'])) as archive:
             self.assertIsNone(archive.testzip())
             names=set(archive.namelist())
-            self.assertEqual(names,{meta['font']['postscript_name']+'.otf','registry.json','project.json','stamp.json','README.txt','bundle.json',
+            filename=pf.install_filename(self.pid,meta['name'])
+            self.assertEqual(names,{filename,'registry.json','project.json','stamp.json','README.txt','bundle.json',
                                     'FONT_NOTICES.txt','font-sources.json','licenses/OFL-1.1.txt',
                                     'licenses/GUST-FONT-LICENSE.txt','licenses/LPPL-1.3c.txt'})
             manifest=json.loads(archive.read('bundle.json'))
@@ -149,13 +177,15 @@ class FontManagement(unittest.TestCase):
             self.assertEqual(exported['entries'][0]['latex'],'x^2')
             self.assertNotIn('svg',exported['entries'][0])
             self.assertNotIn(b'C:/private',archive.read('registry.json'))
-            self.assertEqual(archive.read(meta['font']['postscript_name']+'.otf'),self.font_data)
+            self.assertEqual(archive.read(filename),self.font_data)
+            self.assertEqual(manifest['font_file'],filename)
+            self.assertTrue(archive.getinfo(filename).flag_bits & 0x800)
             stamp=json.loads(archive.read('stamp.json'))
             self.assertEqual(stamp['source_key'],pf._identity(exported))
             self.assertEqual(manifest['display_name'],'数式 A')
             exported_meta=json.loads(archive.read('project.json'))
-            self.assertEqual(exported_meta['schema'],2)
-            self.assertEqual(exported_meta['creation_name'],'数式 A')
+            self.assertEqual(exported_meta['schema'],1)
+            self.assertNotIn('creation_name',exported_meta)
             self.assertEqual(exported_meta['font'],meta['font'])
             self.assertIn(meta['font']['family'],archive.read('README.txt').decode('utf-8'))
             self.assertEqual(manifest['revision'],1)
