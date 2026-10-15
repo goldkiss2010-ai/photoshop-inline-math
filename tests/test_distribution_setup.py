@@ -10,6 +10,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from zipfile import ZipFile
+from windows_test_support import POWERSHELL_PREAMBLE, run_windows_powershell
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools'))
 import app_paths as ap
@@ -88,12 +89,12 @@ assert registry.ROOT!=app_paths.DATA_ROOT
     def test_windows_launcher_parses_and_reads_paths_without_installing(self):
         script=ROOT/'tools/windows_launcher.ps1'
         # Dot-source without main; compare native parsing + actual path calculation.
-        ps="$ErrorActionPreference='Stop'; . $args[0]; $p=Get-PaperMathPaths; if (!(Test-Path -LiteralPath $p.Requirements)) {exit 2}; if (Test-PaperMathReady $p) {Write-Host 'existing-ready'}; $p.Hash"
+        ps=POWERSHELL_PREAMBLE+". $args[0]; $p=Get-PaperMathPaths; if (!(Test-Path -LiteralPath $p.Requirements)) {exit 2}; if (Test-PaperMathReady $p) {Write-Host 'existing-ready'}; $p.Hash"
         command=ROOT/'local-build'/'test-windows-launcher.ps1'
         # Keep harness under a disposable directory, not the application tree.
         with tempfile.TemporaryDirectory() as td:
-            command=Path(td)/'harness.ps1';command.write_text(ps,encoding='utf-8')
-            result=subprocess.run(['powershell.exe','-NoProfile','-ExecutionPolicy','Bypass','-File',str(command),str(script)],capture_output=True,text=True)
+            command=Path(td)/'harness.ps1';command.write_text(ps,encoding='utf-8-sig')
+            result=run_windows_powershell(command,(script,))
             self.assertEqual(result.returncode,0,result.stdout+result.stderr)
             self.assertIn(hashlib.sha256((ROOT/'requirements-runtime.txt').read_bytes()).hexdigest(),result.stdout)
 
@@ -122,8 +123,8 @@ try {Invoke-PaperMath Setup;throw 'SETUP_WITH_SERVER_ACCEPTED'} catch {
 }
 '''
         with tempfile.TemporaryDirectory() as td:
-            harness=Path(td)/'gates.ps1';harness.write_text(ps,encoding='utf-8-sig')
-            result=subprocess.run(['powershell.exe','-NoProfile','-ExecutionPolicy','Bypass','-File',str(harness),str(ROOT/'tools/windows_launcher.ps1')],capture_output=True,text=True)
+            harness=Path(td)/'gates.ps1';harness.write_text(POWERSHELL_PREAMBLE+ps,encoding='utf-8-sig')
+            result=run_windows_powershell(harness,(ROOT/'tools/windows_launcher.ps1',))
             self.assertEqual(result.returncode,0,result.stdout+result.stderr)
 
 if __name__=='__main__':unittest.main()

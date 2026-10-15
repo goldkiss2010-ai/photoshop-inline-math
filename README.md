@@ -10,7 +10,7 @@ Paper Math turns LaTeX expressions into individual OpenType glyphs for native Ph
 
 ## はじめる
 
-利用者向けの[HTMLマニュアル](docs/index.html)を用意しています。ダウンロード、初回設定、普段の起動、数式の変換・復元、制作データの保管を一つのページにまとめています。GitHub Pagesでの公開設定は[Pages公開手順](https://github.com/goldkiss2010-ai/photoshop-inline-math/blob/main/PUBLISH_PAGES.md)を参照してください。
+利用者向けの[HTMLマニュアル](https://goldkiss2010-ai.github.io/photoshop-inline-math/)を公開しています。ダウンロード、初回設定、普段の起動、数式の変換・復元、制作データの保管を一つのページにまとめています。
 
 通常利用の配布ファイルは **`PaperMath-Windows-preview.zip`** です。[配布ページ](https://github.com/goldkiss2010-ai/photoshop-inline-math/releases)に公開されたファイル、または作者から受け取った配布ZIPを使います。GitHubが自動生成する「Source code」のZIPとは、制作データの保存先が異なります。
 
@@ -60,7 +60,7 @@ uv run --no-project python tools/build_distribution.py
 
 テストにはNode.jsも必要です。通常利用には必要ありません。配布ZIPは `local-build/PaperMath-Windows-preview.zip` に生成し、編集可能なソース・CCX・テスト・ライセンス・通知を含みます。
 
-CCX本体を変更する場合は、[作者向けパッケージ手順](docs/PACKAGE_PHOTOSHOP.md)に沿ってAdobe UXP Developer Toolで再作成します。通常の開発情報は[検証手順](docs/TESTING.md)、由来は[ORIGIN.md](docs/ORIGIN.md)、残る確認は[RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md)へまとめています。
+CCX本体を変更する場合は、[作者向けパッケージ手順](docs/PACKAGE_PHOTOSHOP.md)に沿ってAdobe UXP Developer Toolで再作成します。通常の開発情報は[検証手順](docs/TESTING.md)、由来は[ORIGIN.md](docs/ORIGIN.md)、残る確認は[RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md)へまとめています。マニュアルの公開設定は[Pages公開手順](https://github.com/goldkiss2010-ai/photoshop-inline-math/blob/main/PUBLISH_PAGES.md)を参照してください。
 
 ## ライセンス
 

@@ -16,6 +16,14 @@ uv run --no-project --python 3.13.15 --with fonttools==4.67.0 python tools/run_p
 
 CIはLinuxの統合試験とWindowsのランチャー試験を定義しています。CIでの実行結果とローカルの成功は別に記録します。初回の[Actions実行](https://github.com/goldkiss2010-ai/photoshop-inline-math/actions/runs/38692843246)は両ジョブともrunner名・実行stepが空のまま失敗し、テストは開始されていません。原因はこの記録だけでは確定できません。
 
+### 公開後のWindows CI呼び出し（2026-10-16）
+
+[公開直後のCI](https://github.com/goldkiss2010-ai/photoshop-inline-math/actions/runs/38826077183)では、Linuxの統合試験・CCX照合・配布ビルドが成功しました。Windows側は、`Get-FileHash` が見つからない失敗と、日本語出力をcp1252として読むデコードエラーで停止しました。
+
+テストを起動するPowerShell 7の `PSModulePath` がPythonを介してWindows PowerShell 5.1へ渡り、互換性のないモジュールを優先してしまう条件を修正します。テスト子プロセスだけの環境からこの変数を外し、Windows PowerShellが既定の検索先を組み立てるようにします。対処の根拠は[Microsoftの説明](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_psmodulepath#starting-windows-powershell-from-powershell-7)です。
+
+テスト用スクリプトはUTF-8 BOM付きで保存し、PowerShellの出力とPythonの読み取りもUTF-8へ揃えます。これらは `tests/windows_test_support.py` に共通化します。アプリのランチャー・CCX・確定した配布ZIP・公開タグは変更しません。このテストはExplorerから起動する際の既定モジュール環境を再現し、PowerShell 7からCMDを介して起動する経路の確認は含みません。
+
 ## 実機の報告（2026-10-15）
 
 Windows 10 / Photoshop 27.4.0 / MiKTeX 25.12の一環境で、約36,000文字のコード混在原稿の変換・復元とPSD再オープンに成功報告があります。Pythonは3.13.15、fontToolsは4.67.0、PyMuPDFは1.28.2。LuaLaTeXの描画と全8書体の出所記録も確認されています。

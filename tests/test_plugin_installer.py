@@ -10,6 +10,7 @@ import sys
 import tempfile
 import unittest
 from zipfile import ZipFile
+from windows_test_support import POWERSHELL_PREAMBLE, run_windows_powershell
 
 ROOT=Path(__file__).resolve().parents[1]
 SCRIPT=ROOT/'tools/install_photoshop_plugin.ps1'
@@ -54,10 +55,8 @@ class WindowsInstallerTests(unittest.TestCase):
     def run_ps(self,code,extra=()):
         with tempfile.TemporaryDirectory(prefix='paper math 日本語 ') as td:
             harness=Path(td)/'harness.ps1'
-            harness.write_text("$ErrorActionPreference='Stop'\n$pmTestArgs=@($args)\n. $pmTestArgs[0]\n"+code,encoding='utf-8-sig')
-            result=subprocess.run(['powershell.exe','-NoProfile','-ExecutionPolicy','Bypass',
-                                   '-File',str(harness),str(SCRIPT),*map(str,extra)],
-                                  capture_output=True,text=True,timeout=30)
+            harness.write_text(POWERSHELL_PREAMBLE+"$pmTestArgs=@($args)\n. $pmTestArgs[0]\n"+code,encoding='utf-8-sig')
+            result=run_windows_powershell(harness,(SCRIPT,*extra))
             self.assertEqual(result.returncode,0,result.stdout+result.stderr)
 
     def test_parse_and_dot_source_do_not_launch_any_process(self):
