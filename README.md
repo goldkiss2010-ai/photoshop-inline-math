@@ -4,7 +4,7 @@ LaTeXの数式を、Photoshopの本文へ文字として組み込むプラグイ
 
 Paper Math turns LaTeX expressions into individual OpenType glyphs for native Photoshop text, with a persistent LaTeX/PUA mapping for reverse conversion.
 
-**Windowsプレビュー / 0.8.2。** Windows 10・Photoshop 27.4.0で、CCXの導入とUDTを使わない起動について成功報告があります。別PCでの初回導入確認はこれからです。
+**Windowsプレビュー / 0.8.2。** Windows 10・Photoshop 27.4.0で、CCX導入、UDTを使わない起動、配布ZIPを別フォルダーへ展開したセットアップ・起動・変換／復元について成功報告があります。別PCでの初回導入確認はこれからです。
 
 ## はじめる
 
