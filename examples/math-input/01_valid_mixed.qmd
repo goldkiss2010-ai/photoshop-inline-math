@@ -1,0 +1,39 @@
+---
+title: "Paper Math mixed input"
+format: html
+---
+
+# 正常な混在入力
+
+本文のインライン数式 $x^2$ と、金額のエスケープ \$100。
+
+$$
+(1.02,0.01,0.00)
+$$
+
+```{python}
+label = "$not_math$"
+display_source = "$$not_math$$"
+bracket_source = "\\[not_math\\]"
+```
+
+$$
+(2.8,-0.4,-0.2)
+$$続きの本文です。
+
+~~~{r}
+label <- "$also_not_math$"
+~~~
+
+括弧記法 \(\alpha+\beta\) を使う。
+
+\[
+a=b+c
+\]
+
+\begin{align}
+a &= b \\
+c &= d
+\end{align}
+
+最後に同じ式 $x^2$ を再使用する。

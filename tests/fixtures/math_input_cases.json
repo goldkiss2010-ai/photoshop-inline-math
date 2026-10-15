@@ -1,0 +1,498 @@
+{
+  "schema": 1,
+  "note": "Pure scan/plan fixtures. Each case is checked as LF, CRLF, CR. No font/PSD writes.",
+  "cases": [
+    {
+      "id": "mixed_notation",
+      "description": "同じ数式本体を四つの記法で再利用",
+      "source": "前 $x^2$ / $$x^2$$ / \\(x^2\\) / \\[x^2\\] 後",
+      "expected": {
+        "latex": [
+          "x^2",
+          "x^2",
+          "x^2",
+          "x^2"
+        ],
+        "issues": [],
+        "protectedCount": 0,
+        "fatal": false
+      }
+    },
+    {
+      "id": "vectors",
+      "description": "実際に検出漏れが報告された二式",
+      "source": "$$ (1.02,0.01,0.00) $$\n$$ (2.8,-0.4,-0.2) $$",
+      "expected": {
+        "latex": [
+          "(1.02,0.01,0.00)",
+          "(2.8,-0.4,-0.2)"
+        ],
+        "issues": [],
+        "protectedCount": 0,
+        "fatal": false
+      }
+    },
+    {
+      "id": "python_before_vectors",
+      "description": "閉じたPythonコードの後の二式",
+      "source": "```{python}\nlabel = \"$not_math$\"\n```\n$$ (1.02,0.01,0.00) $$\n$$ (2.8,-0.4,-0.2) $$",
+      "expected": {
+        "latex": [
+          "(1.02,0.01,0.00)",
+          "(2.8,-0.4,-0.2)"
+        ],
+        "issues": [],
+        "protectedCount": 1,
+        "fatal": false
+      }
+    },
+    {
+      "id": "tilde_code",
+      "description": "チルダのコードフェンス",
+      "source": "前 $a$\n~~~{r}\nx <- \"$fake$\"\n~~~\n後 $b$",
+      "expected": {
+        "latex": [
+          "a",
+          "b"
+        ],
+        "issues": [],
+        "protectedCount": 1,
+        "fatal": false
+      }
+    },
+    {
+      "id": "adjacent_fences",
+      "description": "異なるコードブロックの連続",
+      "source": "```python\n\"$fake$\"\n```\n~~~r\n\"$$fake$$\"\n~~~\n$x$",
+      "expected": {
+        "latex": [
+          "x"
+        ],
+        "issues": [],
+        "protectedCount": 2,
+        "fatal": false
+      }
+    },
+    {
+      "id": "long_fence",
+      "description": "4文字フェンスの内側に3文字フェンス",
+      "source": "````python\n```\n$fake$\n````\n$x$",
+      "expected": {
+        "latex": [
+          "x"
+        ],
+        "issues": [],
+        "protectedCount": 1,
+        "fatal": false
+      }
+    },
+    {
+      "id": "indent_code",
+      "description": "3スペースまでのコードフェンス",
+      "source": "   ```python\n$fake$\n   ```\n$x$",
+      "expected": {
+        "latex": [
+          "x"
+        ],
+        "issues": [],
+        "protectedCount": 1,
+        "fatal": false
+      }
+    },
+    {
+      "id": "inline_code",
+      "description": "一重バックティック保護",
+      "source": "コード `$fake$` と $x$",
+      "expected": {
+        "latex": [
+          "x"
+        ],
+        "issues": [],
+        "protectedCount": 1,
+        "fatal": false
+      }
+    },
+    {
+      "id": "double_inline_code",
+      "description": "二重バックティック内の一重記号",
+      "source": "コード ``a ` $fake$ `` と $x$",
+      "expected": {
+        "latex": [
+          "x"
+        ],
+        "issues": [],
+        "protectedCount": 1,
+        "fatal": false
+      }
+    },
+    {
+      "id": "unclosed_inline_code",
+      "description": "未閉鎖インラインコードは行末まで保持",
+      "source": "コード `$fake$\n次の $x$",
+      "expected": {
+        "latex": [
+          "x"
+        ],
+        "issues": [
+          "unclosed-inline-code"
+        ],
+        "protectedCount": 1,
+        "fatal": false
+      }
+    },
+    {
+      "id": "unclosed_fence",
+      "description": "未閉鎖コードでも前の確定式は保持",
+      "source": "前 $a$\n```python\n$fake$\n$$fake$$",
+      "expected": {
+        "latex": [
+          "a"
+        ],
+        "issues": [
+          "unclosed-code"
+        ],
+        "protectedCount": 1,
+        "fatal": false
+      }
+    },
+    {
+      "id": "wrong_fence_closer",
+      "description": "異種のフェンスでは閉じない",
+      "source": "前 $a$\n```python\n~~~\n$fake$",
+      "expected": {
+        "latex": [
+          "a"
+        ],
+        "issues": [
+          "unclosed-code"
+        ],
+        "protectedCount": 1,
+        "fatal": false
+      }
+    },
+    {
+      "id": "cross_code_dollar",
+      "description": "コード内のドルを閉じ記号に使わない",
+      "source": "本文 $x\n```python\nlabel = \"$notMath$\"\n```\n続き $y$",
+      "expected": {
+        "latex": [
+          "y"
+        ],
+        "issues": [
+          "unclosed-math"
+        ],
+        "protectedCount": 1,
+        "fatal": false
+      }
+    },
+    {
+      "id": "cross_code_bracket",
+      "description": "ブラケット数式もコード境界を越えない",
+      "source": "未完 \\[x\n```python\nlabel = \"\\\\]\"\n```\n後 $y$",
+      "expected": {
+        "latex": [
+          "y"
+        ],
+        "issues": [
+          "unclosed-math"
+        ],
+        "protectedCount": 1,
+        "fatal": false
+      }
+    },
+    {
+      "id": "empty_math",
+      "description": "空式だけを保留して後続式を処理",
+      "source": "空 $$ $$ と $x$",
+      "expected": {
+        "latex": [
+          "x"
+        ],
+        "issues": [
+          "empty-math"
+        ],
+        "protectedCount": 0,
+        "fatal": false
+      }
+    },
+    {
+      "id": "unclosed_tail",
+      "description": "末尾の閉じ忘れだけ保留",
+      "source": "先頭 $a$ と未完 $bad",
+      "expected": {
+        "latex": [
+          "a"
+        ],
+        "issues": [
+          "unclosed-math"
+        ],
+        "protectedCount": 0,
+        "fatal": false
+      }
+    },
+    {
+      "id": "ambiguous_same_paragraph",
+      "description": "同じ段落の衝突後に推測で再開しない",
+      "source": "先頭 $a$ と $bad$$ conflict $notSafe$",
+      "expected": {
+        "latex": [
+          "a"
+        ],
+        "issues": [
+          "ambiguous-inline"
+        ],
+        "protectedCount": 0,
+        "fatal": false
+      }
+    },
+    {
+      "id": "resume_paragraph",
+      "description": "空行で独立した後続段落に再開",
+      "source": "先頭 $a$\n\n未完 $bad\n\n続き $b$",
+      "expected": {
+        "latex": [
+          "a",
+          "b"
+        ],
+        "issues": [
+          "unclosed-math"
+        ],
+        "protectedCount": 0,
+        "fatal": false
+      }
+    },
+    {
+      "id": "resume_display",
+      "description": "未閉鎖インライン後の明示displayブロック",
+      "source": "未完 $bad\n$$x^2$$\n後 $y$",
+      "expected": {
+        "latex": [
+          "x^2",
+          "y"
+        ],
+        "issues": [
+          "ambiguous-inline"
+        ],
+        "protectedCount": 0,
+        "fatal": false
+      }
+    },
+    {
+      "id": "resume_bracket",
+      "description": "次のブラケットブロックは独立",
+      "source": "未完 \\(bad\n\\[x^2\\]\n後 $y$",
+      "expected": {
+        "latex": [
+          "x^2",
+          "y"
+        ],
+        "issues": [
+          "unclosed-math"
+        ],
+        "protectedCount": 0,
+        "fatal": false
+      }
+    },
+    {
+      "id": "tex_comment",
+      "description": "行コメントのある式だけ保留",
+      "source": "前 $$x % note\n y$$ 後 $z$",
+      "expected": {
+        "latex": [
+          "z"
+        ],
+        "issues": [
+          "tex-comment"
+        ],
+        "protectedCount": 0,
+        "fatal": false
+      }
+    },
+    {
+      "id": "escaped_percent",
+      "description": "エスケープした百分率",
+      "source": "本文 $20\\%$",
+      "expected": {
+        "latex": [
+          "20\\%"
+        ],
+        "issues": [],
+        "protectedCount": 0,
+        "fatal": false
+      }
+    },
+    {
+      "id": "escaped_dollar",
+      "description": "金額のドルをエスケープ",
+      "source": "価格 \\$100、コード `$fake$`、数式 \\(x\\)",
+      "expected": {
+        "latex": [
+          "x"
+        ],
+        "issues": [],
+        "protectedCount": 1,
+        "fatal": false
+      }
+    },
+    {
+      "id": "escaped_closer",
+      "description": "エスケープされた括弧は終了ではない",
+      "source": "\\(x \\\\) + y\\)",
+      "expected": {
+        "latex": [
+          "x \\\\) + y"
+        ],
+        "issues": [],
+        "protectedCount": 0,
+        "fatal": false
+      }
+    },
+    {
+      "id": "closing_adjacent_body",
+      "description": "display閉じ記号の直後に本文",
+      "source": "$$\nx^2\n$$本文です",
+      "expected": {
+        "latex": [
+          "x^2"
+        ],
+        "issues": [],
+        "protectedCount": 0,
+        "fatal": false
+      }
+    },
+    {
+      "id": "wrapped_inline",
+      "description": "通常の折り返し改行を許す",
+      "source": "前 $x+\ny$ 後",
+      "expected": {
+        "latex": [
+          "x+ y"
+        ],
+        "issues": [],
+        "protectedCount": 0,
+        "fatal": false
+      },
+      "expectedHeldFormulas": 1
+    },
+    {
+      "id": "align_multiline",
+      "description": "align環境を一つの数式にする",
+      "source": "\\begin{align}\na&=b \\\\ c&=d\n\\end{align}",
+      "expected": {
+        "latex": [
+          "\\begin{aligned}a&=b \\\\ c&=d\\end{aligned}"
+        ],
+        "issues": [],
+        "protectedCount": 0,
+        "fatal": false
+      }
+    },
+    {
+      "id": "environments",
+      "description": "mathとdisplaymathとgather",
+      "source": "\\begin{math}x\\end{math} / \\begin{displaymath}y\\end{displaymath} / \\begin{gather*}z\\end{gather*}",
+      "expected": {
+        "latex": [
+          "x",
+          "y",
+          "\\begin{gathered}z\\end{gathered}"
+        ],
+        "issues": [],
+        "protectedCount": 0,
+        "fatal": false
+      }
+    },
+    {
+      "id": "plain_body",
+      "description": "数式のない本文",
+      "source": "本文と価格 \\$10",
+      "expected": {
+        "latex": [],
+        "issues": [],
+        "protectedCount": 0,
+        "fatal": false
+      }
+    },
+    {
+      "id": "empty_source",
+      "description": "空の入力",
+      "source": "",
+      "expected": {
+        "latex": [],
+        "issues": [],
+        "protectedCount": 0,
+        "fatal": false
+      }
+    },
+    {
+      "id": "unicode_fatal",
+      "description": "BMP外の投影は全体停止として区別",
+      "source": "本文😀 $x$",
+      "expected": {
+        "latex": [],
+        "issues": [
+          "unsupported-unicode"
+        ],
+        "protectedCount": 0,
+        "fatal": true
+      }
+    },
+    {
+      "id": "literal_pua_code",
+      "description": "コード中の実PUAも保持",
+      "source": "```python\nvalue = \"\"\n```\n$x$",
+      "expected": {
+        "latex": [
+          "x"
+        ],
+        "issues": [],
+        "protectedCount": 1,
+        "fatal": false
+      }
+    },
+    {
+      "id": "broken_display_blank",
+      "description": "空行後の独立した式で再開",
+      "source": "未完 \\[x\n\n独立 $y$",
+      "expected": {
+        "latex": [
+          "y"
+        ],
+        "issues": [
+          "unclosed-math"
+        ],
+        "protectedCount": 0,
+        "fatal": false
+      }
+    },
+    {
+      "id": "unmarked_code_text",
+      "description": "保護記号のないプログラム風文字列は通常入力",
+      "source": "label = \"$x$\"",
+      "expected": {
+        "latex": [
+          "x"
+        ],
+        "issues": [],
+        "protectedCount": 0,
+        "fatal": false
+      }
+    },
+    {
+      "id": "tex_backtick_ambiguity",
+      "description": "TeXの引用符とMarkdownコードの競合は保留して次段落へ",
+      "source": "$\\text{``quoted''}$\n\n独立 $y$",
+      "expected": {
+        "latex": [
+          "y"
+        ],
+        "issues": [
+          "unclosed-math",
+          "unclosed-inline-code"
+        ],
+        "protectedCount": 1,
+        "fatal": false
+      }
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+# Paper Math Photoshop runtime; Windows inventory reported 2026-10-15.
+# Python is selected explicitly by start_inline_math.cmd.
+# This pins Python package versions, not wheel hashes or external TeX packages.
+fonttools==4.67.0
+pymupdf==1.28.2

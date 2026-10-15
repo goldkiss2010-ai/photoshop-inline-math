@@ -1,0 +1,119 @@
+/*
+ * Photoshop UXP script (.psjs), experimental: convert registered $...$ in ONE
+ * selected text layer. Keeps the prose in one editable text layer.
+ * This initial version requires one textStyleRange and one paragraphStyleRange.
+ * It duplicates the text layer and hides the original, so the source is preserved.
+ * Registration and font installation happen OUTSIDE Photoshop via registry.py.
+ */
+const {app, action, core} = require('photoshop');
+const FONT_PS_NAME='InlineMathLab-Regular';
+const FONT_FAMILY='Inline Math Lab';
+
+function fail(msg){throw new Error(msg);}
+function inlineParts(source){
+  if(/[\uD800-\uDFFF]/.test(source)) fail('絵文字等を含むサロゲートペアは試作版では未対応です。');
+  const map=new Map(AIM_ENTRIES.map(e=>[e.latex,e.char]));
+  let text='',runs=[],i=0, mathCount=0;
+  function append(s,kind){
+    if(!s)return;
+    const before=text.length;
+    text+=s;
+    const last=runs[runs.length-1];
+    if(last && last.kind===kind && last.to===before) last.to=text.length;
+    else runs.push({kind,from:before,to:text.length});
+  }
+  while(i<source.length){
+    const c=source[i];
+    if(c==='\\' && source[i+1]==='$'){append('\\$','body');i+=2;continue;}
+    if(c!=='$'){append(c,'body');i++;continue;}
+    if(source[i+1]==='$') fail('$$...$$ は未対応です。');
+    let j=i+1;
+    while(j<source.length){
+      if(source[j]==='\\' && source[j+1]==='$'){j+=2;continue;}
+      if(source[j]==='$')break;
+      j++;
+    }
+    if(j===source.length)fail('閉じ $ がありません。');
+    const formula=source.slice(i+1,j).trim();
+    if(!map.has(formula))fail('未登録の数式: '+formula+'\n先に登録スクリプトを実行してください。');
+    append(map.get(formula),'math');
+    mathCount++;i=j+1;
+  }
+  if(!mathCount)fail('レイヤーに $...$ の数式がありません。');
+  return {text,runs,mathCount};
+}
+function buildDescriptor(original, converted, domSize){
+  const text=original.textKey;
+  if(!Array.isArray(original.textStyleRange) || original.textStyleRange.length!==1 ||
+     !original.textStyleRange[0].textStyle || original.textStyleRange[0].from!==0)
+    fail('試作版は文字スタイル1種類のテキストレイヤーに対応します。');
+  if(!Array.isArray(original.paragraphStyleRange) || original.paragraphStyleRange.length!==1 ||
+     original.paragraphStyleRange[0].from!==0)
+    fail('試作版は段落スタイル1種類のテキストレイヤーに対応します。');
+  const old=original.textStyleRange[0];
+  const p=original.paragraphStyleRange[0];
+  const tail=old.to-text.length;
+  const ptail=p.to-text.length;
+  if(![0,1].includes(tail) || ![0,1].includes(ptail))fail('Photoshopのテキスト範囲が想定外です。');
+  const base=old.textStyle;
+  const size=base.size || base.impliedFontSize ||
+    (base.baseParentStyle && (base.baseParentStyle.size || base.baseParentStyle.impliedFontSize)) || domSize;
+  if(!size)fail('文字サイズを取得できませんでした。');
+  const ranges=converted.runs.map((r,i)=>{
+    let s={...base,_obj:'textStyle'};
+    if(!s.size) s.size=size;
+    if(r.kind==='math'){
+      s.fontPostScriptName=FONT_PS_NAME;
+      s.fontName=FONT_FAMILY;
+      s.fontStyleName='Regular';
+      s.syntheticItalic=false;
+      s.syntheticBold=false;
+    }
+    return {...old,_obj:'textStyleRange',from:r.from,
+      to:r.to+(i===converted.runs.length-1?tail:0),textStyle:s};
+  });
+  const descriptor={...original,_obj:'textLayer',textKey:converted.text,
+    textStyleRange:ranges,
+    paragraphStyleRange:[{...p,_obj:'paragraphStyleRange',from:0,to:converted.text.length+ptail}]};
+  delete descriptor.kerningRange;
+  return descriptor;
+}
+async function main(){
+  try {
+    if(!app.documents.length)fail('Photoshopでドキュメントを開いてください。');
+    const doc=app.activeDocument;
+    if(doc.activeLayers.length!==1)fail('テキストレイヤーを1つ選択してください。');
+    const layer=doc.activeLayers[0];
+    if(!layer || !layer.textItem)fail('テキストレイヤーを選択してください。');
+    const [result]=await action.batchPlay([{
+      _obj:'get',_target:[{_property:'textKey'},{_ref:'textLayer',_id:layer.id}]
+    }],{});
+    if(result && result._obj==='error')fail(result.message||'取得できませんでした。');
+    const existing=result && result.textKey;
+    if(!existing || typeof existing.textKey!=='string')fail('文字情報を取得できませんでした。');
+    const parsed=inlineParts(existing.textKey);
+    let size=null;
+    try{size=layer.textItem.characterStyle.size;}catch(e){}
+    const descriptor=buildDescriptor(existing,parsed,size);
+    await core.executeAsModal(async()=>{
+      let duplicate=null;
+      try{
+        duplicate=await layer.duplicate();
+        duplicate.name=layer.name+' [LaTeX PUA]';
+        const [reply]=await action.batchPlay([{
+          _obj:'set',_target:[{_ref:'textLayer',_id:duplicate.id}],to:descriptor
+        }],{});
+        if(reply && reply._obj==='error')fail(reply.message||'文字属性更新に失敗しました。');
+        layer.visible=false;
+      }catch(err){
+        if(duplicate){try{await duplicate.delete();}catch(ignored){}}
+        throw err;
+      }
+    },{commandName:'Insert registered LaTeX as PUA'});
+    await app.showAlert('数式 '+parsed.mathCount+'件を1つのテキストレイヤー内で変換しました。');
+  }catch(err){
+    console.error('Inline PUA failure:',err);
+    await app.showAlert('Inline PUA: '+(err.message||String(err)));
+  }
+}
+await main();

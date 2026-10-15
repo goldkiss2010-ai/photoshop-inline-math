@@ -1,0 +1,68 @@
+:root {color-scheme:dark;}
+title {display:none;}
+body {font-family:system-ui,sans-serif;font-size:13px;color:#eee;margin:0;}
+/* Use explicit bounds supported by UXP. The panel must have a finite height
+   before overflow can scroll; inset is not in the UXP CSS reference. */
+main {position:absolute;top:0;right:0;bottom:0;left:0;width:100vw;height:100vh;
+  display:flex;flex-direction:column;min-height:0;min-width:0;
+  padding:10px 12px 18px;box-sizing:border-box;overflow-y:auto;overflow-x:hidden;}
+/* Keep sections at their content height, so expanded tools overflow instead
+   of being compressed into a docked panel. */
+main > * {flex:0 0 auto;min-width:0;}
+h1 {font-size:16px;font-weight:600;margin:0 0 5px;}
+h2 {font-size:12px;font-weight:600;margin:3px 0 5px;}
+p {line-height:1.4;}
+#server-status.ok {color:#a7d3a6;}
+#server-status.bad,#message.error {color:#ffafad;}
+button {display:block;padding:8px 10px;margin:6px 0;width:100%;box-sizing:border-box;
+  border-radius:6px;font-size:13px;border:1px solid #888;color:white;}
+button.primary {background:#2862b2;}
+button.secondary {background:#454545;}
+button:disabled {opacity:.45;}
+label {display:block;margin:6px 0 4px;}
+label.option {display:flex;align-items:center;gap:5px;}
+label.option input {margin:0;flex-shrink:0;}
+select {width:100%;min-height:30px;box-sizing:border-box;background:#333;color:white;}
+#summary {margin:7px 0;white-space:pre-wrap;overflow-wrap:anywhere;}
+#font-row {padding:8px;border:1px solid #777;border-radius:6px;margin:7px 0;}
+.hidden,#font-row.hidden {display:none;}
+#advanced-options {padding:4px 0 8px;}
+#mapping-content {font-family:monospace;white-space:pre-wrap;overflow-wrap:anywhere;
+  border:1px solid #555;border-radius:4px;padding:9px;max-height:240px;overflow-y:auto;}
+#message {max-height:130px;overflow-y:auto;white-space:pre-wrap;overflow-wrap:anywhere;margin:4px 0;}
+.hint {color:#bbb;font-size:11px;}
+hr {border:0;border-top:1px solid #777;margin:14px 0;}
+code {font-family:monospace;}
+
+#style-report {font-family:monospace;font-size:11px;white-space:pre-wrap;
+  overflow-wrap:anywhere;border:1px solid #555;border-radius:4px;padding:9px;
+  max-height:440px;overflow-y:auto;}
+
+/* Compact Photoshop panel. Primary actions and pending apply appear before
+   verbose options; the whole panel remains scrollable at narrow docked sizes. */
+#panel-header {margin-bottom:6px;}
+#server-status {margin:4px 0;line-height:1.35;overflow-wrap:anywhere;}
+#panel-header #check {width:auto;min-height:24px;padding:4px 9px;margin:4px 0;font-size:11px;}
+#font-manager {padding:3px 0 5px;border-bottom:1px solid #575757;}
+#font-manager select {margin:0 0 5px;}
+#font-manager label.option {margin:5px 0;}
+#primary-actions {margin:5px 0 9px;}
+#primary-actions button.primary {font-weight:600;}
+#font-row strong {color:#e5e5e5;}
+#font-row p {margin:5px 0 7px;}
+#font-status-detail {max-height:95px;overflow-y:auto;white-space:pre-wrap;overflow-wrap:anywhere;}
+.disclosure {border-top:1px solid #535353;margin:5px 0 0;padding:5px 0;}
+button.disclosure-toggle {cursor:pointer;font-size:12px;color:#ddd;text-align:left;
+  background:transparent;border:0;border-radius:0;padding:6px 1px;margin:0;}
+.disclosure > div {padding:4px 0 8px;}
+#math-scan-list {font-size:11px;white-space:pre-wrap;overflow-wrap:anywhere;
+  max-height:250px;overflow-y:auto;}
+#font-project-new-name,#font-project-rename-name {box-sizing:border-box;width:100%;min-height:30px;background:#333;color:#eee;border:1px solid #888;}
+
+#font-project-info {margin:3px 0 6px;white-space:pre-wrap;}
+#font-internal-name {white-space:pre-wrap;overflow-wrap:anywhere;}
+#conversion-holds {padding:8px;border:1px solid #88733d;border-radius:6px;margin:8px 0;}
+#conversion-holds p {margin:4px 0;}
+#hold-list {font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere;
+  margin:5px 0;max-height:200px;overflow-y:auto;}
+#experimental-tools {border:1px solid #666;border-radius:4px;padding:5px 7px;margin:9px 0;}

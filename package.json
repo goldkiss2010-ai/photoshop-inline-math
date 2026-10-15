@@ -1,0 +1,12 @@
+{
+  "name": "photoshop-inline-math",
+  "version": "0.8.2",
+  "private": true,
+  "license": "AGPL-3.0-only",
+  "description": "Paper Math for Photoshop — native text and LaTeX round trips",
+  "scripts": {
+    "test": "python tools/run_partial_integration_tests.py",
+    "test:syntax": "python tools/run_partial_math_tests.py"
+  },
+  "engines": { "node": ">=20" }
+}

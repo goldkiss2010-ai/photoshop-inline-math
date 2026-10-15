@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "font": {
+    "family": "Inline Math Lab",
+    "postscript_name": "InlineMathLab-Regular",
+    "engine": "pdflatex"
+  },
+  "entries": [
+    {
+      "codepoint": "E000",
+      "latex": "\\dfrac{a+b}{c}",
+      "mode": "inline"
+    },
+    {
+      "codepoint": "E001",
+      "latex": "\\int_0^1 x^2\\,\\mathrm{d}x",
+      "mode": "inline"
+    },
+    {
+      "codepoint": "E002",
+      "latex": "\\displaystyle\\sum_{i=0}^{n}x_i",
+      "mode": "inline"
+    },
+    {
+      "codepoint": "E003",
+      "latex": "\\sqrt{x^2+1}",
+      "mode": "inline"
+    },
+    {
+      "codepoint": "E004",
+      "latex": "x_i^2",
+      "mode": "inline"
+    },
+    {
+      "codepoint": "E005",
+      "latex": "\\alpha+\\beta",
+      "mode": "inline"
+    }
+  ],
+  "next_codepoint": "E006"
+}

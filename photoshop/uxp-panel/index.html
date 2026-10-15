@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Paper Math</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<main>
+  <header id="panel-header">
+    <h1>Paper Math</h1>
+    <p id="server-status" role="status">サーバー接続を確認中</p>
+    <button id="check" class="secondary">接続を確認</button>
+  </header>
+  <section id="font-manager" aria-label="フォントと変換設定">
+    <label for="font-project">使用する数式フォント</label>
+    <select id="font-project"><option value="legacy">Inline Math Lab（従来）</option></select>
+    <p id="font-project-info" class="hint" aria-live="polite"></p>
+    <label class="option"><input id="duplicate-mode" type="checkbox"> 複製を作成する（元レイヤーを保持）</label>
+  </section>
+  <section id="primary-actions" aria-label="変換操作">
+    <button id="convert" class="primary">数式を変換</button>
+    <button id="restore" class="secondary">数式をLaTeXに戻す</button>
+    <section id="font-row" class="hidden" aria-label="未完了の変換">
+      <p><strong>数式の適用待ち</strong></p>
+      <p class="hint">フォントと対象レイヤーを照合してから適用します。</p>
+      <p id="font-status-detail" class="hint" aria-live="polite"></p>
+      <button id="font-verify" class="primary">フォントを照合して適用</button>
+      <button id="font-manual" class="secondary">フォントの更新先を開く</button>
+      <button id="font-cancel" class="secondary">変換待ちを取り消す</button>
+    </section>
+    <p id="message" role="status" aria-live="polite"></p>
+    <p id="summary" aria-live="polite"></p>
+    <section id="conversion-holds" class="hidden" aria-label="保留箇所と理由">
+      <h2>保留・確認事項</h2>
+      <p id="hold-count" class="hint" aria-live="polite"></p>
+      <pre id="hold-list"></pre>
+      <p class="hint">位置は変換前の本文を示します。原文を修正して再度変換するか、該当箇所を別レイヤーで扱えます。</p>
+    </section>
+  </section>
+  <section id="conversion-options" class="disclosure">
+    <button id="conversion-options-toggle" class="disclosure-toggle" aria-controls="conversion-options-body" aria-expanded="false">変換する式を指定</button>
+    <div id="conversion-options-body" class="hidden">
+      <label class="option"><input id="advanced" type="checkbox"> 特定の数式だけ変換する（同一式は一括）</label>
+      <section id="advanced-options" class="hidden">
+        <p class="hint">記法が違っても、同じ内容の式はまとめて変換します。オフにするとレイヤー内の全数式が対象です。</p>
+        <button id="scan" class="secondary">候補を更新</button>
+        <label for="candidate">対象の式</label>
+        <select id="candidate"></select>
+      </section>
+    </div>
+  </section>
+  <section id="font-management-details" class="disclosure">
+    <button id="font-management-details-toggle" class="disclosure-toggle" aria-controls="font-management-details-body" aria-expanded="false">フォントを作成・管理</button>
+    <div id="font-management-details-body" class="hidden">
+      <label for="font-project-new-name">新しい数式フォント</label>
+      <input id="font-project-new-name" type="text" maxlength="28" placeholder="例：数式図版 2026">
+      <button id="font-project-create" class="secondary">新規作成して選択</button>
+      <p class="hint">最初の変換でフォントを生成します。生成したフォントのWindowsへのインストール・更新は手動です。</p>
+      <hr>
+      <label for="font-project-rename-name">選択中のフォントの表示名</label>
+      <input id="font-project-rename-name" type="text" maxlength="28" placeholder="Paper Mathで作成したフォントを選択">
+      <button id="font-project-rename" class="secondary">表示名を変更</button>
+      <p class="hint">Paper Math内の表示名を変更します。従来のInline Math Labは対象外です。</p>
+      <p id="font-internal-name" class="hint"></p>
+      <hr>
+      <button id="font-project-export" class="secondary">フォントと対応表をZIPに書き出す</button>
+      <p class="hint">生成済みのフォントとLaTeX対応表を一組で保存します。</p>
+      <button id="font-project-refresh" class="secondary">フォント一覧を更新</button>
+    </div>
+  </section>
+  <section id="usage-help" class="disclosure">
+    <button id="usage-help-toggle" class="disclosure-toggle" aria-controls="usage-help-body" aria-expanded="false">使い方・対応する数式記法</button>
+    <div id="usage-help-body" class="hidden">
+      <p>テキストレイヤーを1つ選択して変換します。標準では同じレイヤーを更新し、チェックを入れたときだけ複製を作成します。同一レイヤーの変更はヒストリーでUndoできます。保存・再起動後に必要な原稿やバックアップは別途管理してください。</p>
+      <p><code>$...$</code>・<code>$$...$$</code>・<code>\(...\)</code>・<code>\[...\]</code> と math / displaymath / equation / align / gather / multline 環境が対象です。混在にも対応し、明示したコードブロックと行内コードは変換・復元の対象から除きます。</p>
+      <p>閉じ記号が見つからない範囲や生成できない式は原文で保留し、確定した式を変換します。対応表の不整合や本文の意図しない変更があれば操作を止め、理由を表示します。</p>
+      <p>LaTeXに戻す際は、変換時と同じ数式フォントを選んでください。復元後の区切りは <code>$...$</code> に統一し、数式内の改行・元の数式書式の完全復元は保証しません。本文書体を推定できない数式だけのレイヤーでは復元を停止します。</p>
+      <p class="hint">QMDやコードを文字どおり保持する場合は、Photoshopの「環境設定 → テキスト → スマート引用符を使用」をオフにしてください。</p>
+      <p class="hint">Copyright (C) 2026 Paper Math contributors. コードはAGPL-3.0-onlyで、同ライセンスに従い変更・再配布できます。無保証です。編集可能なソースをプロジェクトに同梱しています。全文はLICENSE、範囲はLICENSE_SCOPE.mdを参照してください。生成フォントの字形には別の条件があります。</p>
+    </div>
+  </section>
+  <section id="diagnostic-tools" class="disclosure">
+    <button id="diagnostic-tools-toggle" class="disclosure-toggle" aria-controls="diagnostic-tools-body" aria-expanded="false">診断・詳細情報</button>
+    <div id="diagnostic-tools-body" class="hidden">
+      <p class="hint">表示や復元に問題があるときに使用します。</p>
+      <section id="math-scan-details" class="disclosure">
+        <button id="math-scan-details-toggle" class="disclosure-toggle" aria-controls="math-scan-details-body" aria-expanded="false">検出した数式の内訳（読み取りのみ）</button>
+        <div id="math-scan-details-body" class="hidden">
+          <pre id="math-scan-list"></pre>
+        </div>
+      </section>
+      <button id="mapping-toggle" class="secondary" disabled>直前の変換のLaTeX / 文字コードを表示</button>
+      <pre id="mapping-content" class="hidden"></pre>
+      <button id="export-pua-html" class="secondary">登録した数式をHTML一覧に保存して開く</button>
+      <p class="hint">生成済みフォントを埋め込んだ一覧で、字形・文字コード・LaTeXを確認します。</p>
+      <button id="diagnose-style" class="secondary">数式と本文の書式を診断（読み取りのみ）</button>
+      <p class="hint">表示がずれる場合は変換後のレイヤーを選択します。書式を読み取り、結果をコピーまたはJSONで保存できます。</p>
+      <section id="experimental-tools" class="disclosure">
+        <button id="experimental-tools-toggle" class="disclosure-toggle" aria-controls="experimental-tools-body" aria-expanded="false">開発用の復元試験</button>
+        <div id="experimental-tools-body" class="hidden">
+          <button id="probe-restore-conflict" class="secondary">競合書式を仮解決して復元を試験（読み取りのみ）</button>
+          <p class="hint">同じ範囲の重複書式について、先／後の書式を採用する2通りで復元準備だけを検証します。</p>
+          <button id="probe-restore-write" class="secondary">試験用複製に復元して読み戻す（実験）</button>
+          <p class="hint">テスト用PSDのコピーで実行してください。一時複製へ実際に書き込み、読み戻して削除します。元レイヤーは編集・非表示にしませんが、ヒストリーに操作が残る可能性があります。</p>
+        </div>
+      </section>
+      <pre id="style-report" class="hidden"></pre>
+      <div id="style-report-actions" class="hidden">
+        <button id="copy-style-report" class="secondary" disabled>診断結果をコピー</button>
+        <button id="save-style-report" class="secondary" disabled>診断結果をJSONで保存</button>
+      </div>
+    </div>
+  </section>
+</main>
+<script src="panel.js"></script>
+</body>
+</html>
