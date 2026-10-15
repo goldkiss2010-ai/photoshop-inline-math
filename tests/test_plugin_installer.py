@@ -41,7 +41,7 @@ class WindowsInstallerTests(unittest.TestCase):
     def run_ps(self,code,extra=()):
         with tempfile.TemporaryDirectory(prefix='paper math 日本語 ') as td:
             harness=Path(td)/'harness.ps1'
-            harness.write_text("$ErrorActionPreference='Stop'\n. $args[0]\n"+code,encoding='utf-8-sig')
+            harness.write_text("$ErrorActionPreference='Stop'\n$pmTestArgs=@($args)\n. $pmTestArgs[0]\n"+code,encoding='utf-8-sig')
             result=subprocess.run(['powershell.exe','-NoProfile','-ExecutionPolicy','Bypass',
                                    '-File',str(harness),str(SCRIPT),*map(str,extra)],
                                   capture_output=True,text=True,timeout=30)
@@ -50,7 +50,7 @@ class WindowsInstallerTests(unittest.TestCase):
     def test_parse_and_dot_source_do_not_launch_any_process(self):
         self.run_ps(r'''
 $tokens=$null; $parseErrors=$null
-[Management.Automation.Language.Parser]::ParseFile($args[0],[ref]$tokens,[ref]$parseErrors) | Out-Null
+[Management.Automation.Language.Parser]::ParseFile($pmTestArgs[0],[ref]$tokens,[ref]$parseErrors) | Out-Null
 if ($parseErrors.Count -ne 0) {throw 'PARSE_ERROR'}
 if (!(Get-Command Invoke-PaperMathPluginInstall)) {throw 'MISSING_FUNCTION'}
 ''')
@@ -96,10 +96,10 @@ try {Invoke-PaperMathPluginInstall Normal; throw 'ASSOCIATION_FAILURE_ACCEPTED'}
             probe.write_text('import json, pathlib, sys\npathlib.Path(sys.argv[1]).write_text(json.dumps(sys.argv[2:],ensure_ascii=True),encoding="utf-8")\n',encoding='utf-8')
             self.run_ps(r'''
 $ccx='D:\配布 フォルダー & 100% #\plugin\PaperMath.ccx'
-$nativeArgs=@(('"'+$args[2]+'"'),('"'+$args[3]+'"'))+(Get-PaperMathDirectInstallArguments $ccx)
-$process=Start-Process -FilePath $args[1] -ArgumentList $nativeArgs -Wait -PassThru
+$nativeArgs=@(('"'+$pmTestArgs[2]+'"'),('"'+$pmTestArgs[3]+'"'))+(Get-PaperMathDirectInstallArguments $ccx)
+$process=Start-Process -FilePath $pmTestArgs[1] -ArgumentList $nativeArgs -Wait -PassThru
 if ($process.ExitCode -ne 0) {throw 'ARGV_PROBE_FAILED'}
-$result=Get-Content -LiteralPath $args[3] -Raw | ConvertFrom-Json
+$result=Get-Content -LiteralPath $pmTestArgs[3] -Raw | ConvertFrom-Json
 if ($result.Count -ne 2 -or $result[0] -ne '--workflow=routeToPath') {throw 'ARGV_SPLIT'}
 $prefix='--routePath=/pmp/action/doubleClick?filePath='
 if (!$result[1].StartsWith($prefix)) {throw 'WRONG_ROUTE'}

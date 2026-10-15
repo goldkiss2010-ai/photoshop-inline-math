@@ -14,7 +14,7 @@ uv run --no-project --python 3.13.15 --with fonttools==4.67.0 python tools/run_p
 
 配布ZIPを一時フォルダーへ展開し、外部の空データ保存先でLinuxの実TeX/SVG/OTFによる冷起動とAPI応答も確認しました。本体147ファイルは不変で、制作データは外部だけに生成されました。Windowsの初回導入を代替する試験ではありません。
 
-CIはLinuxの統合試験とWindowsのランチャー試験を定義しています。CIでの実行結果とローカルの成功は別に記録します。
+CIはLinuxの統合試験とWindowsのランチャー試験を定義しています。CIでの実行結果とローカルの成功は別に記録します。初回の[Actions実行](https://github.com/goldkiss2010-ai/photoshop-inline-math/actions/runs/38692843246)は両ジョブともrunner名・実行stepが空のまま失敗し、テストは開始されていません。原因はこの記録だけでは確定できません。
 
 ## 実機の報告（2026-10-15）
 
