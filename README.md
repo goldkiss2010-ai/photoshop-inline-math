@@ -44,7 +44,7 @@ Paper Math turns LaTeX expressions into individual OpenType glyphs for native Ph
 - 約36,000文字のコード混在原稿の往復とPSD再オープンについて実機成功報告があります。すべての長文・書式・環境の保証ではありません。
 - 数式内の改行・元の区切り記号・変換前の数式書式の完全復元、ZIPの自動読み込み、他アプリとの相互編集は現在の対象外です。
 - 絵文字や一部の拡張漢字など、BMP外の文字を含むテキストレイヤーは未対応です。
-- ブラウザ版・Illustrator版・過去の実験はこのリポジトリに含めません。ブラウザ版の機能整理とPagesは後続の作業です。
+- Photoshopを使わない方向けの**ブラウザ版は開発中**です。現時点ではPhotoshop版との制作フォントの共有・相互追加には対応していません。ブラウザ試作・Illustrator版・過去の実験は、このPhotoshop専用リポジトリには含めません。
 
 入力例は[混在サンプル](examples/math-input/README.md)、対応範囲は[既知の制約](docs/KNOWN_LIMITATIONS.md)、困ったときは[トラブル対処](docs/TROUBLESHOOTING.md)を参照してください。技術的な詳細は[現行仕様](docs/CURRENT_SPEC.md)、[フォント管理](docs/PROJECT_FONT_MANAGEMENT.md)、[検証状況](docs/TESTING.md)にまとめています。
 

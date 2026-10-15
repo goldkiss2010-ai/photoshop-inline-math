@@ -23,4 +23,6 @@
 
 Mac、Illustrator、Word、PowerPoint、ブラウザ版との相互編集は今回の対象外です。名称とアイコンは暫定です。生成フォントの出所通知と利用条件は、そのフォントに対応して確認します。
 
+Photoshopを使わない方向けのブラウザ版は開発中です。現在の試作はPhotoshop版と生成方式が異なり、制作フォントの共有・相互追加には対応していません。
+
 使い方は[導入ガイド](INSTALL_WINDOWS.md)、不具合の切り分けは[トラブル対処](TROUBLESHOOTING.md)、詳しい検証結果は[TESTING.md](TESTING.md)を参照してください。
