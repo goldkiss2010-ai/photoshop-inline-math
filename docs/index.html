@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Paper Math for Photoshopのダウンロードと使い方。Windowsでの初回設定、LaTeX数式の変換・復元、制作フォントの保管を案内します。">
+  <meta name="color-scheme" content="light">
+  <title>Paper Math for Photoshop — ダウンロードと使い方</title>
+  <style>
+    :root{--paper:#fcfbf8;--ink:#252c29;--muted:#59645e;--line:#dedfd8;--accent:#245841;--soft:#edf2eb;--code:#f0eee7}
+    *{box-sizing:border-box}
+    html{scroll-padding-top:1.5rem}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI","Yu Gothic UI","Hiragino Kaku Gothic ProN",sans-serif;font-size:16px;line-height:1.9;overflow-wrap:anywhere}
+    a{color:var(--accent);text-underline-offset:.22em}
+    a:hover{text-decoration-thickness:2px}
+    a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:5px}
+    button{font:inherit}
+    [hidden]{display:none!important}
+    .skip{position:absolute;top:-8rem;left:1rem;padding:.5rem 1rem;background:var(--paper);z-index:2}
+    .skip:focus{top:1rem}
+    .site-header{max-width:1180px;margin:auto;padding:1.6rem 2rem;border-bottom:1px solid var(--line);display:flex;align-items:baseline;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+    .brand{color:var(--ink);font-weight:650;text-decoration:none;letter-spacing:.015em}
+    .brand span{font-weight:400;color:var(--muted);font-size:.85rem;margin-left:.6rem}
+    .header-link{font-size:.85rem}
+    .layout{max-width:1180px;margin:auto;padding:2.8rem 2rem 5rem;display:grid;grid-template-columns:196px minmax(0,1fr);gap:4rem;align-items:start}
+    .contents{position:sticky;top:1.8rem;font-size:.88rem}
+    .contents p{margin:0 0 .7rem;color:var(--muted);font-size:.75rem;letter-spacing:.08em}
+    .contents ol{list-style:none;margin:0;padding:0}
+    .contents li{margin:.35rem 0}
+    .contents a{display:block;padding:.25rem 0;color:var(--muted);text-decoration:none}
+    .contents a:hover{color:var(--accent);text-decoration:underline}
+    main{min-width:0;max-width:790px}
+    .eyebrow{color:var(--accent);font-size:.8rem;letter-spacing:.08em;margin:0 0 .7rem}
+    h1{font-size:clamp(1.75rem,3.5vw,2.65rem);line-height:1.4;letter-spacing:-.025em;margin:0 0 1.1rem;font-weight:650}
+    h2{font-size:1.45rem;line-height:1.5;margin:0 0 1.3rem;font-weight:650}
+    h3{font-size:1.04rem;margin:1.8rem 0 .45rem}
+    p{margin:.6rem 0 1rem}
+    .lead{font-size:1.07rem;line-height:1.95;max-width:42em}
+    .small{font-size:.87rem;color:var(--muted)}
+    .intro-example{margin:1.6rem 0 0;padding:1.1rem 1.4rem;border-left:3px solid var(--accent);background:var(--soft)}
+    .intro-example p{margin:.3rem 0}
+    .label{display:inline-block;min-width:4.8rem;font-size:.78rem;color:var(--muted);vertical-align:middle}
+    math{font-size:1.18em;margin:0 .15em}
+    section{margin-top:3.4rem;padding-top:2.4rem;border-top:1px solid var(--line)}
+    .number{font-size:.8rem;font-weight:500;color:var(--accent);margin-right:.7rem}
+    .download{padding:1.5rem 1.6rem;background:white;border:1px solid var(--line)}
+    .download-title{font-weight:650;margin:0}
+    .download-status{margin:.45rem 0 1rem;font-size:.9rem;color:var(--muted)}
+    .actions{display:flex;align-items:center;gap:.8rem 1.3rem;flex-wrap:wrap}
+    .button{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:.6rem 1.2rem;background:var(--accent);color:white;text-decoration:none;font-weight:600;font-size:.95rem;border:1px solid var(--accent);border-radius:3px;text-align:center}
+    .button:hover{background:#1a4431}
+    .download-file{margin:1rem 0 0;font-size:.83rem;color:var(--muted)}
+    .requirements{margin-top:1.8rem}
+    .requirements div{display:grid;grid-template-columns:8rem minmax(0,1fr);gap:.9rem;padding:.65rem 0;border-bottom:1px solid var(--line)}
+    dt{font-weight:600}
+    dd{margin:0}
+    code,pre{font-family:ui-monospace,"Cascadia Code","SFMono-Regular",Consolas,monospace}
+    code{font-size:.9em;background:var(--code);padding:.12em .32em;border-radius:2px}
+    pre{margin:1rem 0;padding:1rem 1.2rem;background:var(--code);font-size:.9rem;line-height:1.85;white-space:pre-wrap;overflow-wrap:anywhere;tab-size:2}
+    pre code{padding:0;background:none;font-size:inherit}
+    .steps{list-style:none;padding:0;margin:0;counter-reset:step}
+    .steps>li{counter-increment:step;position:relative;margin:1.7rem 0;padding-left:2.7rem}
+    .steps>li::before{content:counter(step,decimal-leading-zero);position:absolute;left:0;top:.1rem;color:var(--accent);font-size:.8rem;font-weight:650}
+    .steps>li>h3{margin:0 0 .4rem}
+    .steps>li>p:last-child{margin-bottom:0}
+    .note{border-left:2px solid var(--line);padding:.1rem 0 .1rem 1.2rem;margin:1.3rem 0}
+    .note p{margin:.4rem 0}
+    .copy-row{display:flex;align-items:center;gap:1rem;min-height:2rem;flex-wrap:wrap}
+    .copy{padding:.2rem .7rem;border:1px solid var(--line);border-radius:3px;background:white;color:var(--accent);font-size:.83rem;cursor:pointer;min-height:36px}
+    .copy:hover{border-color:var(--accent)}
+    .table-wrap{overflow-x:auto;margin:1rem 0}
+    table{width:100%;border-collapse:collapse;font-size:.93rem;text-align:left}
+    caption{text-align:left;font-weight:600;margin-bottom:.5rem}
+    th,td{padding:.75rem .65rem;border-bottom:1px solid var(--line);vertical-align:top}
+    th{font-weight:600}
+    td:first-child{width:40%}
+    details{border-bottom:1px solid var(--line);padding:.9rem 0}
+    summary{cursor:pointer;font-weight:600;line-height:1.7;padding:.3rem 0}
+    details>p,details>ul{margin:.8rem 0 .5rem}
+    li{margin:.45rem 0}
+    .plain-list{padding-left:1.3rem}
+    footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--line);font-size:.8rem;color:var(--muted)}
+    .footer-links{display:flex;gap:.5rem 1.3rem;flex-wrap:wrap;margin:.6rem 0}
+    @media(max-width:900px){.layout{gap:2rem;grid-template-columns:164px minmax(0,1fr);padding-left:1.5rem;padding-right:1.5rem}.site-header{padding-left:1.5rem;padding-right:1.5rem}}
+    @media(max-width:700px){.site-header{padding:1.1rem 1.25rem}.brand span{display:block;margin:0}.layout{display:block;padding:1.5rem 1.25rem 3rem}.contents{position:static;border-bottom:1px solid var(--line);padding-bottom:1.3rem;margin-bottom:2rem}.contents ol{display:grid;grid-template-columns:1fr 1fr;column-gap:1rem}.contents a{padding:.35rem 0}h1{font-size:1.9rem}section{margin-top:2.5rem;padding-top:1.8rem}.download{padding:1.2rem}.requirements div{grid-template-columns:5rem minmax(0,1fr);gap:.65rem}.steps>li{padding-left:2rem}.label{display:block}.intro-example{padding:.8rem 1rem}th,td{padding:.65rem .3rem}td:first-child{width:44%}}
+    @media print{body{background:white;font-size:10pt}.site-header{padding:0 0 1rem}.layout{display:block;padding:1rem 0}.contents,.header-link,.skip,.copy-row,.actions{display:none}main{max-width:none}section{margin-top:1.5rem;padding-top:1rem}h1{font-size:24pt}h2{font-size:15pt}h1,h2,h3,summary{break-after:avoid}pre,.download,.requirements div{break-inside:avoid}details{break-inside:avoid}.download{padding:1rem}a{color:inherit}footer{margin-top:1.5rem}}
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">本文へ移動</a>
+  <header class="site-header" id="top">
+    <a class="brand" href="#top">Paper Math <span>for Photoshop</span></a>
+    <a class="header-link" href="https://github.com/goldkiss2010-ai/photoshop-inline-math">GitHub / ソースコード</a>
+  </header>
+  <div class="layout">
+    <nav class="contents" aria-label="このページの目次">
+      <p>使い方</p>
+      <ol>
+        <li><a href="#download">01　ダウンロード</a></li>
+        <li><a href="#setup">02　初回の準備</a></li>
+        <li><a href="#start">03　毎回の起動</a></li>
+        <li><a href="#convert">04　変換と復元</a></li>
+        <li><a href="#input">05　入力のルール</a></li>
+        <li><a href="#data">06　データの保管・更新</a></li>
+        <li><a href="#help">07　困ったとき</a></li>
+        <li><a href="#scope">対応範囲について</a></li>
+      </ol>
+    </nav>
+    <main id="main">
+      <p class="eyebrow">WINDOWS PREVIEW · 0.8.2</p>
+      <h1>ダウンロードと使い方</h1>
+      <p class="lead">LaTeXの数式を、Photoshopの本文へ文字として組み込みます。<br>同じテキストレイヤーのまま、数式をLaTeXへ戻して編集できます。</p>
+      <p>制作物ごとに数式用フォントを作り、必要な式を追加して使います。通常利用にGit・Node.js・UXP Developer Toolは必要ありません。</p>
+      <div class="intro-example">
+        <p><span class="label">入力</span> <code>本文 $x_i^2$ と $\frac{a+b}{c}$。</code></p>
+        <p><span class="label">変換イメージ</span> 本文 <math aria-label="x iの2乗"><msubsup><mi>x</mi><mi>i</mi><mn>2</mn></msubsup></math> と <math aria-label="aたすbをcで割る"><mfrac><mrow><mi>a</mi><mo>+</mo><mi>b</mi></mrow><mi>c</mi></mfrac></math>。</p>
+      </div>
+
+      <section id="download" aria-labelledby="download-heading" data-release-tag="v0.8.2-preview.1">
+        <h2 id="download-heading"><span class="number">01</span>ダウンロード</h2>
+        <div class="download">
+          <p class="download-title">Paper Math for Photoshop / Windowsプレビュー</p>
+          <p class="download-status" id="release-status" role="status">配布ページで公開状況をご確認ください。公開済みの場合は、Assetsから下の名前のZIPを選びます。</p>
+          <div class="actions">
+            <a class="button" id="download-link" href="https://github.com/goldkiss2010-ai/photoshop-inline-math/releases">配布ページを開く</a>
+            <a href="#setup">初回の準備へ</a>
+          </div>
+          <p class="download-file">配布ファイル：<code>PaperMath-Windows-preview.zip</code><br>ソース・プラグイン本体・入力例・通知文書を含みます。<a id="checksum-link" hidden>SHA-256照合用ファイル</a></p>
+        </div>
+        <p class="small">GitHubが自動生成する「Source code」のZIPとは別のファイルです。配布ZIPをすべて展開して使ってください。このページはHTMLマニュアルです。ブラウザ版のツールは開発中です。</p>
+        <dl class="requirements">
+          <div><dt>対象</dt><dd>WindowsのPhotoshop。プラグインの導入にはCreative Cloudデスクトップアプリを使います。</dd></div>
+          <div><dt>別途必要</dt><dd><a href="https://miktex.org/download">MiKTeXなどのTeX環境</a>。数式を描画するために使います。</dd></div>
+          <div><dt>自動で準備</dt><dd>Pythonと必要なPythonパッケージは、Setupが専用の場所に用意します。</dd></div>
+          <div><dt>ネット接続</dt><dd>ダウンロード・初回セットアップ・TeXの追加パッケージ導入時に必要です。</dd></div>
+        </dl>
+        <p class="small">Windows 10 / Photoshop 27.4.0 / MiKTeX 25.12の一環境で動作報告があります。別PCでの初回導入は未確認のプレビュー版です。</p>
+      </section>
+
+      <section id="setup" aria-labelledby="setup-heading">
+        <h2 id="setup-heading"><span class="number">02</span>初回の準備</h2>
+        <ol class="steps">
+          <li><h3>ZIPをすべて展開する</h3><p>ダウンロードしたZIPを展開し、中の <code>PaperMath</code> フォルダーを保存します。ZIPを開いたまま、中のファイルを直接実行しないでください。</p><p>フォルダー内の <code>FIRST_START.html</code> からも基本の手順を読めます。</p></li>
+          <li><h3>TeXを用意する</h3><p><a href="https://miktex.org/download">MiKTeXの配布サイト</a>からWindows版を導入します。追加パッケージのインストールを求められた場合は、内容を確認して導入します。</p><details><summary>必要なTeXの構成</summary><p>コマンドは <code>pdflatex</code>・<code>lualatex</code>・<code>kpsewhich</code>、パッケージは <code>standalone</code>・<code>amsmath</code>・<code>amssymb</code> が必要です。不足は <code>Check_Paper_Math.cmd</code> で確認できます。</p></details></li>
+          <li><h3>Setupを実行する</h3><p><code>Setup_Paper_Math.cmd</code> をダブルクリックし、準備が完了するまで待ちます。初回はネット接続が必要です。</p><p>Pythonを手動で導入・選択する操作は不要です。</p></li>
+          <li><h3>Photoshopプラグインをインストールする</h3><p><code>Install_Photoshop_Plugin.cmd</code> をダブルクリックし、Creative Cloudの確認画面でインストールします。</p><p>確認画面が出ない場合は <code>Install_Photoshop_Plugin_Alternative.cmd</code> を試してください。完了はCreative Cloudのプラグイン管理と、Photoshopの「プラグイン」メニューで確認します。</p></li>
+        </ol>
+        <p>ここまで済んだら、次の手順でPaper Mathを起動します。</p>
+      </section>
+
+      <section id="start" aria-labelledby="start-heading">
+        <h2 id="start-heading"><span class="number">03</span>毎回の起動</h2>
+        <ol class="steps">
+          <li><h3>Startを開く</h3><p><code>Start_Paper_Math.cmd</code> をダブルクリックします。開いた処理用ウィンドウは、作業中はそのままにします。</p></li>
+          <li><h3>Photoshopでパネルを開く</h3><p>Photoshopの「プラグイン」→「Paper Math」を開きます。</p></li>
+        </ol>
+        <div class="note"><p><strong>使い終わったら</strong><br>PSDを保存し、Startのウィンドウを閉じるか、そこでCtrl+Cを押して終了します。閉じている間は、数式の生成・変換・復元はできません。</p></div>
+        <p class="small">Setupとプラグインのインストールを、毎回行う必要はありません。</p>
+      </section>
+
+      <section id="convert" aria-labelledby="convert-heading">
+        <h2 id="convert-heading"><span class="number">04</span>最初の数式を変換する</h2>
+        <ol class="steps">
+          <li><h3>本文と数式を入力する</h3><p>Photoshopでテキストレイヤーを作り、次のサンプルを入力します。</p><pre><code id="sample">本文 $x_i^2$ と $\frac{a+b}{c}$。</code></pre><div class="copy-row"><button class="copy" id="copy-sample" type="button" hidden>サンプルをコピー</button><span class="small" id="copy-status" role="status"></span></div></li>
+          <li><h3>制作物用のフォントを作る</h3><p>パネルの「フォントを作成・管理」を開き、制作物が分かる名前を入力して「新規作成して選択」を押します。続きの作業では、同じ制作フォントを選びます。</p></li>
+          <li><h3>数式を変換する</h3><p>対象のテキストレイヤーを1つ選び、「数式を変換」を押します。初回は数式フォントが生成され、適用待ちになります。</p></li>
+          <li><h3>生成されたフォントをWindowsへ入れる</h3><p>パネルの「フォントの更新先を開く」を押します。選択されたOTFファイルを開き、Windowsのフォント画面からインストールします。既存版がある場合は、Windowsの案内に沿って更新します。</p><p class="small">ファイル名の例：<code>PaperMath-数式図版-a1b2c3d4.otf</code>。Photoshopのフォント一覧に出る名前は英数字の内部名ですが、案内されたファイルを使えば照合できます。</p></li>
+          <li><h3>照合して適用する</h3><p>パネルに戻り、「フォントを照合して適用」を押します。本文内の数式が文字として表示されます。</p><p>認識されないときは、PSDを保存してPhotoshopを再起動し、同じ制作フォントとレイヤーで変換し直します。</p></li>
+        </ol>
+        <div class="note"><p><strong>フォントを入れ直すタイミング</strong><br>最初の生成時と、新しい式を追加してフォントが更新されたときです。同じ生成版で登録済みの式を使うだけなら、毎回のインストールは不要です。</p></div>
+        <h3>LaTeXへ戻して編集する</h3>
+        <p>変換時と同じ制作フォントとテキストレイヤーを選び、「数式をLaTeXに戻す」を押します。戻した式を編集し、もう一度変換できます。</p>
+        <p>復元後の数式は <code>$...$</code> に統一されます。元の区切り記号・数式内の改行・数式の書式を完全に再現する機能ではありません。</p>
+        <h3>元のレイヤーも残したいとき</h3>
+        <p>標準では同じレイヤーを更新します。「複製を作成する（元レイヤーを保持）」にチェックすると複製へ変換します。作業中の変更はPhotoshopのUndoで戻せます。保存・終了後も必要な元原稿は、別途保管してください。</p>
+      </section>
+
+      <section id="input" aria-labelledby="input-heading">
+        <h2 id="input-heading"><span class="number">05</span>入力のルール</h2>
+        <p>数式にする範囲を、LaTeXの区切りで明示します。本文・改行・数式ブロックが混在した原稿も対象です。</p>
+        <div class="table-wrap"><table>
+          <caption>数式として読み取る記法</caption>
+          <thead><tr><th scope="col">記法</th><th scope="col">入力例</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">ドル記号</th><td><code>$x_i^2$</code> / <code>$$\sum_{i=1}^{n} i$$</code></td></tr>
+            <tr><th scope="row">LaTeXの区切り</th><td><code>\(x_i^2\)</code> / <code>\[x_i^2\]</code></td></tr>
+            <tr><th scope="row">数式環境</th><td><code>math</code> / <code>displaymath</code> / <code>equation</code> / <code>align</code> / <code>gather</code> / <code>multline</code></td></tr>
+          </tbody>
+        </table></div>
+        <h3>QMDやコードを含む場合</h3>
+        <p>バッククォートで囲んだ行内コードと、コードフェンスの中は変換対象から外し、原文のまま保持します。</p>
+        <pre><code>本文には $x_i^2$ を使います。
+
+$$
+\sum_{i=1}^{n} i
+$$
+
+`$ここは行内コードとして保持$`
+
+```python
+formula = "$x_i^2$"
+```</code></pre>
+        <p class="small">引用符を文字どおり保持するには、Photoshopの「環境設定 → テキスト → スマート引用符を使用」をオフにします。入力例は配布ZIPの <code>examples/math-input</code> にも入っています。</p>
+        <h3>一部の式が変換されないとき</h3>
+        <p>閉じ記号が曖昧な範囲や、TeXで生成できない個別の式は、原文のまま保留されることがあります。パネルの行番号・抜粋・理由を確認し、原稿を直して再実行するか、その箇所を別レイヤーで扱います。</p>
+        <p>フォントと対応表の不一致、本文の意図しない変更などを検出した場合は、操作全体を停止します。</p>
+      </section>
+
+      <section id="data" aria-labelledby="data-heading">
+        <h2 id="data-heading"><span class="number">06</span>データの保管と更新</h2>
+        <p><strong>数式フォントと、LaTeXの対応表は一組で保管します。</strong> PSDを別のPCで表示するには同じOTFが必要です。LaTeXへ戻すには、そのフォントの対応表も必要になります。</p>
+        <div class="table-wrap"><table>
+          <caption>保管に使う操作</caption>
+          <thead><tr><th scope="col">操作</th><th scope="col">できること</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">フォントと対応表をZIPに書き出す</th><td>パネルの「フォントを作成・管理」から、生成済みOTF・対応表・出所通知を一緒に保存します。</td></tr>
+            <tr><th scope="row"><code>Open_Paper_Math_Data.cmd</code></th><td>制作データの保存先を開きます。完全なバックアップは、Startを終了してからこのフォルダー全体をコピーします。</td></tr>
+          </tbody>
+        </table></div>
+        <p class="small">書き出したフォントZIPを自動で読み込む機能は、現在未実装です。継続編集のバックアップには制作データフォルダー全体を保存してください。</p>
+        <h3>保存される場所</h3>
+        <p>配布用ZIPでは、制作データを <code>%LOCALAPPDATA%\PaperMath\data</code>、専用Pythonなどの実行環境を <code>%LOCALAPPDATA%\PaperMath\runtime</code> に保存します。アプリ本体は展開した <code>PaperMath</code> フォルダーにあります。</p>
+        <h3>Paper Mathを更新する</h3>
+        <p>Startを終了し、新しい配布ZIPを別のフォルダーへ展開して <code>Setup_Paper_Math.cmd</code> を実行します。配布版では同じ制作データを引き継ぎます。プラグインが更新された版では、CCXの再インストールも行います。</p>
+        <p class="small">Gitや「Source code」のZIPを利用していた場合は保存先が異なります。旧開発版からの移行は、<a href="https://github.com/goldkiss2010-ai/photoshop-inline-math/blob/main/docs/WINDOWS_PREVIEW.md">保存先と更新の詳細</a>を参照してください。</p>
+      </section>
+
+      <section id="help" aria-labelledby="help-heading">
+        <h2 id="help-heading"><span class="number">07</span>困ったとき</h2>
+        <p>まず <code>Check_Paper_Math.cmd</code> をダブルクリックして、環境の点検結果を確認します。点検は一時フォルダーで行われ、PSDやWindows登録フォントは変更しません。</p>
+        <details><summary>プラグインのインストール画面が出ない</summary><p><code>Install_Photoshop_Plugin_Alternative.cmd</code> を試します。導入完了はCreative Cloudのプラグイン管理とPhotoshopのメニューで確認してください。</p><p><code>status = -645</code> はCreative Cloud連携の失敗です。終了コードが0でも成功とは扱いません。代替起動も含む詳しい切り分けは、<a href="https://github.com/goldkiss2010-ai/photoshop-inline-math/blob/main/docs/INSTALL_WINDOWS.md">導入ガイド</a>に記載しています。</p></details>
+        <details><summary>パネルが接続できない</summary><p>Setupが完了していることを確認し、<code>Start_Paper_Math.cmd</code> を開きます。別の版やフォルダーのStartを起動している場合は、先にそちらを終了します。作業中は処理用ウィンドウを開いたままにしてください。</p></details>
+        <details><summary>TeXや数式の生成で止まる</summary><p>Checkに表示された不足コマンド・パッケージを導入します。個別の式だけが保留される場合は、パネルの行番号・抜粋・理由を確認して、その式を修正します。</p></details>
+        <details><summary>フォントが未認識・旧版・不一致になる</summary><p>制作フォントを確認し、「フォントの更新先を開く」から案内されたOTFをインストール・更新します。認識されなければPSDを保存してPhotoshopを再起動し、同じ制作フォントで変換します。</p><p>インストール用ファイルは日本語の管理名を含みますが、Photoshopのフォント一覧の名前は英数字の内部名です。同じ式でも、別の制作フォントに置き換えず、対応するものを使ってください。</p></details>
+        <details><summary>数式をLaTeXへ戻せない</summary><p>変換時と同じ制作フォントと対応表を使います。本文書体を推定できない、数式だけのレイヤーでは復元を停止する場合があります。絵文字や一部の拡張漢字を含むレイヤーも未対応です。</p></details>
+        <details><summary>以前の制作フォントが見つからない</summary><p><code>Open_Paper_Math_Data.cmd</code> で保存先を確認します。配布ZIPと旧ソース版では保存先が異なります。<a href="https://github.com/goldkiss2010-ai/photoshop-inline-math/blob/main/docs/WINDOWS_PREVIEW.md">保存先と更新の詳細</a>に沿って、対応する制作データを使ってください。</p></details>
+        <p class="small">解決しない場合は、<a href="https://github.com/goldkiss2010-ai/photoshop-inline-math/issues">GitHub Issues</a>へ、Windows・Photoshop・Creative Cloudの版、再現手順、エラー文、Checkの結果を添えてください。短い再現用の入力例があると確認しやすくなります。</p>
+      </section>
+
+      <section id="scope" aria-labelledby="scope-heading">
+        <h2 id="scope-heading">対応範囲について</h2>
+        <ul class="plain-list">
+          <li>今回の配布対象はWindowsのPhotoshopです。Macや他のアプリとの相互編集は対象外です。</li>
+          <li>絵文字や一部の拡張漢字など、BMP外の文字を含むテキストレイヤーは処理できません。</li>
+          <li>長い原稿や多数の式では、生成フォント・PSDのサイズと処理時間が増えます。必要に応じてレイヤーや制作フォントを分けてください。</li>
+          <li>Photoshopを使わない方向けのブラウザ版は開発中です。現時点では制作フォントの共有・相互追加に対応していません。</li>
+        </ul>
+        <p>詳しくは<a href="https://github.com/goldkiss2010-ai/photoshop-inline-math/blob/main/docs/KNOWN_LIMITATIONS.md">既知の制約</a>と<a href="https://github.com/goldkiss2010-ai/photoshop-inline-math/blob/main/docs/TESTING.md">検証状況</a>を参照してください。</p>
+      </section>
+      <footer>
+        <p>Paper Math for Photoshop · Windows Preview 0.8.2<br>名称・アイコンは暫定です。</p>
+        <p>原コードはAGPL-3.0-only。生成フォントの字形には元フォントの条件が適用されます。利用者の原稿やPSDへアプリのライセンスを一律に適用するものではありません。書き出したフォントの出所通知も一緒に保管してください。</p>
+        <div class="footer-links">
+          <a href="https://github.com/goldkiss2010-ai/photoshop-inline-math">ソース・開発手順</a>
+          <a href="https://github.com/goldkiss2010-ai/photoshop-inline-math/blob/main/LICENSE_SCOPE.md">ライセンスの範囲</a>
+          <a href="https://github.com/goldkiss2010-ai/photoshop-inline-math/blob/main/THIRD_PARTY_NOTICES.md">依存の通知</a>
+          <a href="#top">ページの先頭へ</a>
+        </div>
+      </footer>
+    </main>
+  </div>
+  <script>
+    (() => {
+      const repo = 'https://github.com/goldkiss2010-ai/photoshop-inline-math';
+      const tag = document.getElementById('download').dataset.releaseTag;
+      const status = document.getElementById('release-status');
+      const link = document.getElementById('download-link');
+      // Use the preview tag: GitHub's /latest endpoint excludes pre-releases.
+      const assetUrl = (asset, name) => {
+        if (!asset || asset.name !== name || asset.state !== 'uploaded') return null;
+        const expected = `${repo}/releases/download/${tag}/${name}`;
+        return asset.browser_download_url === expected ? expected : null;
+      };
+      async function checkRelease() {
+        try {
+          const response = await fetch(`https://api.github.com/repos/goldkiss2010-ai/photoshop-inline-math/releases/tags/${encodeURIComponent(tag)}`, {
+            headers: { Accept: 'application/vnd.github+json' }, credentials: 'omit', referrerPolicy: 'no-referrer', signal: AbortSignal.timeout(8000)
+          });
+          if (response.status === 404) {
+            status.textContent = 'Windowsプレビュー版は公開準備中です。公開後、ここから配布ZIPをダウンロードできます。';
+            return;
+          }
+          if (!response.ok) throw new Error('Release unavailable');
+          const release = await response.json();
+          if (release.draft || release.tag_name !== tag || !Array.isArray(release.assets)) throw new Error('Release not published');
+          const zip = assetUrl(release.assets.find(asset => asset.name === 'PaperMath-Windows-preview.zip'), 'PaperMath-Windows-preview.zip');
+          if (!zip) {
+            status.textContent = '配布ZIPを準備中です。公開状況は配布ページをご確認ください。';
+            return;
+          }
+          link.href = zip;
+          link.textContent = 'Windows版をダウンロード';
+          status.textContent = '0.8.2 / Windows Preview 1 · ZIPをすべて展開してからお使いください。';
+          const checksum = assetUrl(release.assets.find(asset => asset.name === 'SHA256SUMS.txt'), 'SHA256SUMS.txt');
+          if (checksum) {
+            const checksumLink = document.getElementById('checksum-link');
+            checksumLink.href = checksum;
+            checksumLink.hidden = false;
+          }
+        } catch {
+          status.textContent = '公開状況を自動確認できませんでした。配布ページのAssetsから、PaperMath-Windows-preview.zipをお選びください。';
+        }
+      }
+      checkRelease();
+      const copyButton = document.getElementById('copy-sample');
+      if (window.isSecureContext && navigator.clipboard && navigator.clipboard.writeText) {
+        copyButton.hidden = false;
+        copyButton.addEventListener('click', async () => {
+          const copyStatus = document.getElementById('copy-status');
+          try {
+            await navigator.clipboard.writeText(document.getElementById('sample').textContent);
+            copyStatus.textContent = 'コピーしました。Photoshopのテキストレイヤーへ貼り付けてください。';
+          } catch {
+            copyStatus.textContent = 'コピーできませんでした。上のサンプルを選択してコピーしてください。';
+          }
+        });
+      }
+      // Include the troubleshooting answers when the manual is printed.
+      let printState = [];
+      window.addEventListener('beforeprint', () => {
+        printState = Array.from(document.querySelectorAll('details'), detail => [detail, detail.open]);
+        printState.forEach(([detail]) => { detail.open = true; });
+      });
+      window.addEventListener('afterprint', () => {
+        printState.forEach(([detail, open]) => { detail.open = open; });
+      });
+    })();
+  </script>
+</body>
+</html>

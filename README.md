@@ -10,6 +10,8 @@ Paper Math turns LaTeX expressions into individual OpenType glyphs for native Ph
 
 ## はじめる
 
+利用者向けの[HTMLマニュアル](docs/index.html)を用意しています。ダウンロード、初回設定、普段の起動、数式の変換・復元、制作データの保管を一つのページにまとめています。GitHub Pagesでの公開設定は[Pages公開手順](https://github.com/goldkiss2010-ai/photoshop-inline-math/blob/main/PUBLISH_PAGES.md)を参照してください。
+
 通常利用の配布ファイルは **`PaperMath-Windows-preview.zip`** です。[配布ページ](https://github.com/goldkiss2010-ai/photoshop-inline-math/releases)に公開されたファイル、または作者から受け取った配布ZIPを使います。GitHubが自動生成する「Source code」のZIPとは、制作データの保存先が異なります。
 
 1. ZIPをすべて展開し、`PaperMath` フォルダー内の `FIRST_START.html` を開きます。

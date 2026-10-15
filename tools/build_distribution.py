@@ -16,7 +16,7 @@ ROOT=Path(__file__).resolve().parents[1]
 TOP_FILES=('Setup_Paper_Math.cmd','Start_Paper_Math.cmd','Check_Paper_Math.cmd',
            'Open_Paper_Math_Data.cmd','Install_Photoshop_Plugin.cmd','Install_Photoshop_Plugin_Alternative.cmd',
            'Prepare_Photoshop_Package.cmd','start_inline_math.cmd','check_inline_math.cmd',
-           'FIRST_START.html','README.md','requirements-runtime.txt','LICENSE',
+           'FIRST_START.html','docs/index.html','README.md','requirements-runtime.txt','LICENSE',
            'LICENSE_SCOPE.md','THIRD_PARTY_NOTICES.md')
 # These are application source roots, not a walk of the checkout. Author data,
 # generated scripts, assets and binary fonts have no route into the archive.
